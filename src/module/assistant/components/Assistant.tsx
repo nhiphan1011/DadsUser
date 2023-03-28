@@ -218,7 +218,7 @@ const Assistant = () => {
         setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const handleStart = (i: number) => {
-        if (i === 1) ref.current.focus()
+        ref.current.focus()
         setIndexStart(i)
         setCountReply(countReply => countReply + 1)
     }
@@ -382,13 +382,15 @@ const Assistant = () => {
                     </div>
                     <div className="flex justify-center items-center space-x-5 mb-5">
                         {YesNoButtonStart.map((item, i) => {
+
+
                             return (
                                 <div
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                         if (countReply < 0) handleStart(i)
-                                        if (i === 1) {
-                                            setDisabled(false)
-                                            ref.current.focus()// bấm bao nhiu lần chat now cũng auto focus
+                                        if (i == 1) {
+                                            await setDisabled(false)
+                                            await ref.current.focus() // bấm bao nhiu lần chat now cũng auto focus
                                         }
                                     }}
                                     key={i}
