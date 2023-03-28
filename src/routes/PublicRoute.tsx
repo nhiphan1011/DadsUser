@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 
 import PublicPage from "pages/PublicPage";
-import { Register } from "pages/RegisterPage";
+// import { Register } from "pages/RegisterPage";
 import Home from "pages/home";
 import WatchToEarnPage from "pages/watchtoearn/WatchToEarn";
 import MissionToEarn from "pages/missiontoearn/MissionToEarn";

@@ -1,7 +1,7 @@
 import { Navigate, RouteObject } from "react-router-dom";
 
 import { PublicLayout } from "components/layouts";
-import { Register } from "pages/RegisterPage";
+// import { Register } from "pages/RegisterPage";
 
 const AuthRoutes = (auth: boolean) => {
   return [
@@ -11,7 +11,7 @@ const AuthRoutes = (auth: boolean) => {
       children: [
         {
           index: true,
-          element: <Register />,
+          // element: <Register />,
         },
       ],
     },
