@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {}
+
+html {
+  font-size: 10px;
+  font-family: "Roboto", sans-serif;
+}
+
+a {
+  curser: pointer;
+}
+
+p,
+a,
+span,
+ul,
+li,
+div {
+  @apply text-[1.2rem];
+}
+
+.nextArrow::before,
+.prevArrow::before {
+  font-size: 30px;
+}
+
+.nextArrow::before {
+  content: "&#xe316";
+}
+
+.prevArrow::before {
+  font-size: 30px;
+}
+
+.truncate2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.truncate4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.slick-slide {
+  height: 100%;
+}
+
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide {
+  height: inherit !important;
+}
+
+.slick-slide div {
+  height: 100%;
+  max-height: 250px;
+}
+
+.typingIndicatorBubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 40px;
+  margin: 0px 8px;
+  background-color: #f0f1f1;
+  border-radius: 12px;
+}
+
+.typingIndicatorBubbleDot {
+  width: 4px;
+  height: 4px;
+  margin-right: 4px;
+  background-color: #57585a;
+  border-radius: 50%;
+  animation-name: bounce;
+  animation-duration: 1.3s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.typingIndicatorBubbleDot:first-of-type {
+  margin: 0px 4px;
+}
+
+.typingIndicatorBubbleDot:nth-of-type(2) {
+  animation-delay: 0.15s;
+}
+
+.typingIndicatorBubbleDot:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bounce {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-4px);
+  }
+}

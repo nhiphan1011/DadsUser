@@ -1,0 +1,1 @@
+export const API_URL = "https://cms.dadsnetwork.co/api/aiLeyBot"
