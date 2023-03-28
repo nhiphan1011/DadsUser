@@ -48,14 +48,14 @@ const authAPI = {
       "mutation"
     );
   },
-  loginUser: (variables: NAuthAPI.ILogin, requestHeaders?: any) => {
-    return wrapper(
-      (wrappedRequestHeader: any) =>
-        gqlClient.request(loginUserGraph, variables, { ...requestHeaders, ...wrappedRequestHeader }),
-      "loginUser",
-      "mutation"
-    );
-  },
+  // loginUser: (variables: NAuthAPI.ILogin, requestHeaders?: any) => {
+  //   return wrapper(
+  //     (wrappedRequestHeader: any) =>
+  //       gqlClient.request(loginUserGraph, variables, { ...requestHeaders, ...wrappedRequestHeader }),
+  //     "loginUser",
+  //     "mutation"
+  //   );
+  // },
   getNonce: (variables?: any, requestHeaders?: any) => {
     return wrapper(
       (wrappedRequestHeader: any) =>

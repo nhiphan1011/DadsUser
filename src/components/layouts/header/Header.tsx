@@ -7,14 +7,14 @@ import SearchField from "components/formcontrols/SearchField";
 import Dropdown from "./Dropdown";
 import LoginButton from "./LoginButton";
 
-import { loginUser } from "module/auth";
+// import { loginUser } from "module/auth";
 
 import { BellIcon } from "@heroicons/react/24/solid";
 const Header = () => {
   const dispatch = useAppDispatch();
 
   const handleClick = () => {
-    dispatch(loginUser());
+    // dispatch(loginUser());
   };
 
   return (

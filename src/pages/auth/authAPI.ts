@@ -22,14 +22,14 @@ const authAPI = {
       "mutation"
     );
   },
-  loginUser: (variables: IWeb3Token, requestHeaders?: any) => {
-    return wrapper(
-      (wrappedRequestHeader: any) =>
-        gqlClient.request(loginUserGraph, variables, { ...requestHeaders, ...wrappedRequestHeader }),
-      "loginUser",
-      "mutation"
-    );
-  },
+  // loginUser: (variables: IWeb3Token, requestHeaders?: any) => {
+  //   return wrapper(
+  //     (wrappedRequestHeader: any) =>
+  //       gqlClient.request(loginUserGraph, variables, { ...requestHeaders, ...wrappedRequestHeader }),
+  //     "loginUser",
+  //     "mutation"
+  //   );
+  // },
   getNonce: (variables?: any, requestHeaders?: any) => {
     return wrapper(
       (wrappedRequestHeader: any) =>
