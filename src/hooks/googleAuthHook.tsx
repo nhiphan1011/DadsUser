@@ -3,7 +3,7 @@ import React from "react";
 import axiosClient from "services/axiosClients";
 import { useAppDispatch } from "./reduxHooks";
 
-import { authAction, getGoogleAuth } from "module/auth";
+// import { authAction, getGoogleAuth } from "module/auth";
 
 const useGoogleAuth = () => {
   const dispatch = useAppDispatch();
@@ -11,7 +11,7 @@ const useGoogleAuth = () => {
   const handleGoogleButton = () => {
     console.log("hello");
 
-    dispatch(getGoogleAuth());
+    // dispatch(getGoogleAuth());
   };
   return {
     handleGoogleButton,
