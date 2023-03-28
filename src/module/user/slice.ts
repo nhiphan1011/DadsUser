@@ -12,13 +12,13 @@ export const submitUser = createAsyncThunk(
     try {
       const response = await USER_API.submitUserr({ updateInput });
       if (response) {
-        const data = response.updateSubmission;
-        if (!data.success) {
-          dispatch(globalAction.openNotify({ message: data.msg, format: "error" }));
-          throw rejectWithValue(data.msg);
-        }
-        dispatch(userAction.closeSubmitFrom());
-        return data;
+        // const data = response.updateSubmission;
+        //   if (!data.success) {
+        //     dispatch(globalAction.openNotify({ message: data.msg, format: "error" }));
+        //     throw rejectWithValue(data.msg);
+        //   }
+        //   dispatch(userAction.closeSubmitFrom());
+        //   return data;
       }
     } catch (error: any) {
       console.log("sdfa", error.payload);
