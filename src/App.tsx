@@ -12,20 +12,20 @@ import * as Layout from "components/layouts";
 import Notify from "components/common/notify/Notify";
 import { PopupUser } from "module/user";
 
-import { getUser } from "module/auth";
-import { selectAuth } from "pages/auth/authSlice";
+// import { getUser } from "module/auth";
+// import { selectAuth } from "pages/auth/authSlice";
 
 function App() {
   const dispatch = useAppDispatch();
-  const { isAuth } = useAppSelector(selectAuth);
+  // const { isAuth } = useAppSelector(selectAuth);
 
-  useEffect(() => {
-    dispatch(getUser());
-  }, [isAuth]);
+  // useEffect(() => {
+  //   dispatch(getUser());
+  // }, [isAuth]);
 
   return (
     <>
-      <div className="App">{useRoutes([...PublicRoute, ...AutRoutes(isAuth)])}</div>
+      <div className="App">{useRoutes([...PublicRoute, ...AutRoutes(true)])}</div>
       <Notify />
       <PopupUser />
     </>
