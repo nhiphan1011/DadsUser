@@ -8,18 +8,20 @@ import User from "../../../assets/image/User.png";
 import { API_URL } from "../constants";
 import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonEnd, YesNoButtonStart } from 'constant';
 
+
 // gom state, ứng dụng spread 
 const Assistant = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [index3, setIndex3] = useState<boolean>(false)
     const [index, setIndex] = useState<number>();
     const [indexStart, setIndexStart] = useState<number>(-1);
-    const [indexObj, setIndexObj] = useState<number>();
-    const [indexYN, setIndexYN] = useState<number>();
-    const [indexTopic, setIndexTopic] = useState<number>();
-    const [indexTopic2, setIndexTopic2] = useState<number>();
-    const [indexOptions, setIndexOptions] = useState<number>();
+    const [indexObj, setIndexObj] = useState<number>(-1);
+    const [indexYN, setIndexYN] = useState<number>(-1);
+    const [indexTopic, setIndexTopic] = useState<number>(-1);
+    const [indexTopic2, setIndexTopic2] = useState<number>(-1);
+    const [indexOptions, setIndexOptions] = useState<number>(-1);
     const [countReply, setCountReply] = useState<number>(-1);// sau 1 click count+=1
+    const [countYN, setCountYN] = useState<number>(0)
     const [text, setText] = useState<string>("");
     const [textBot, setTextBot] = useState<string | any>("");
     const [textBotExample, setTextBotExample] = useState<string>("");
@@ -30,14 +32,14 @@ const Assistant = () => {
     const [email, setEmail] = useState<string>("")
     const [disabled, setDisabled] = useState<boolean>(true)
     // console.log(loading, index3, index, indexStart, indexObj, indexYN, indexTopic, indexTopic2, indexOptions, countReply, text, textBot, textBotExample, countTextBotExample, selected, textOptionBot, message, email, disabled)
-    // console.log('countReply', countReply)
+    console.log('countReply', countReply)
     // console.log('index:', index)
     // console.log('text:', text)
     // console.log('textBot:', textBot)
     // console.log('message:', message)
     // console.log('indexStart:', indexStart)
     // console.log('textBotExample:', textBotExample)
-    // console.log('countTextBotExample:', countTextBotExample)
+    console.log('countTextBotExample:', countTextBotExample)
     // console.log('textOptionBot:', textOptionBot)
 
     const post = async (act: string, skill: string, topic: string, question: string, topicLv2: string, message: string) => {
@@ -76,7 +78,6 @@ const Assistant = () => {
                     setCountReply(countReply => countReply + 1)
                     setLoading(true)
                     count += 1;
-                    console.log(count, "check couneee")
                     if (count === 5) {
                         setLoading(false)
                         setTextBotExample(TextBotExample[6])
@@ -137,8 +138,7 @@ const Assistant = () => {
                     // case index 1+2 countReply === 3 ; indexObj !== 0 ngăn case 0 khi ở countReply === 3 không bị call api
                     post("", "", "", text, "", "")
                 } else if (indexObj === 3 && countReply >= 1) setIndex3(true) // case Index =3
-                // CASE NO in SELECT INDEX=0
-                else if (indexObj === 0 && indexYN === 1 && countTextBotExample === 2) {
+                else if (indexObj === 0 && indexYN === 1 && countTextBotExample === 2) {// CASE NO in SELECT INDEX=0
                     console.log("RUNNING CASE NO")
                     setTextBotExample(TextBotExample[7])
                 } else if ((indexObj === 1 || indexObj === 2) && countReply === 1) {
@@ -163,9 +163,10 @@ const Assistant = () => {
             document.getElementsByClassName("box-wrap")[0].appendChild(botDiv);
             document.getElementById(`${countReply}bot`)?.appendChild(nodeImgBot);
             document.getElementById(`${countReply}bot`)?.appendChild(elementBotDivChildren);
-            // countReply = 2 ,5 Case0 ; 
+            // Script (Nochat)
             if (indexStart === 0) {
                 if (indexObj === 0) {
+                    // countReply = 2 ,5 Case0 ; 
                     if (countReply === 2 || countReply === 5) {
                         setTextBotExample(TextBotExample[countTextBotExample])
                     }
@@ -215,33 +216,46 @@ const Assistant = () => {
         document.getElementsByClassName("box-wrap")[0].appendChild(botDiv);
         document.getElementById(`${countReply}exam`)?.appendChild(nodeImgBot);
         document.getElementById(`${countReply}exam`)?.appendChild(elementBotDivChildren);
+        // if (countYN === 1 && )
         setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const handleStart = (i: number) => {
-        ref.current.focus()
+        // ref.current.focus()
         setIndexStart(i)
         setCountReply(countReply => countReply + 1)
+
     }
     const ref: any = useRef();
     const handleObjective = (e: any, i: number) => {
+        // lúc mới start vào
         if (countReply < 1) {
             setIndexObj(i);
             handleChangeText(e);
             setCountReply(countReply => countReply + 1)
         }
+        // case YN=1 và call lại lần 1
     }
     const handleSend = (e: any) => {
+        // lúc select&send xuất hiện lần đầu
         if (countReply === 1) {
             setLoading(true)
             post(text, selected, "", "", "", "");
             setCountReply(countReply => countReply + 1)
         }
+        // post lúc indexYN=1 (case No) và countReply = 3
+        // else if (indexYN === 1 && countReply === 3) {
+        //     setLoading(true)
+        //     post(text, selected, "", "", "", "");
+        //     setCountReply(countReply => countReply + 1)
+        // }
     }
     const handleYesNoButton = (e: any, i: number) => {
+        // Yes/No lần 1 
         if (countTextBotExample === 2) {
             setIndexYN(i);
             handleChangeText(e);
             setCountReply(countReply => countReply + 1)
+            setCountYN(countYN => countYN + 1)// đềm số lần YN
         }
 
     }
@@ -253,7 +267,7 @@ const Assistant = () => {
         }
     }
     const handleOption = (e: any, i: number) => {
-        // counReply=4 cho Case index0, =2 và khác 3 cho case index1&2
+        // counReply=4 cho Case index0 ; =2 và khác 3 cho case index1&2
         if (countTextBotExample === 4 && countReply <= 4 && countReply !== 3) {
             setIndexOptions(i);
             handleChangeText(e);
@@ -279,6 +293,22 @@ const Assistant = () => {
         post("", "", "", "", "", message)
         setMessage("")
     }
+    const TopicComponent = <div className=" space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
+        {Topic.map((item, i) => {
+            return (
+                <div
+                    onClick={(e) => handleTopic(e, i)}
+                    key={i}
+                    className={`flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer w-full
+                        bg-[${indexTopic === i ? "blue" : "#F2F4F5"}] 
+                        text-[${indexTopic === i ? "white" : "primary"}] 
+                        hover:bg-[${indexTopic < 0 ? "blue" : "#F2F4F5"}]
+                        hover:text-[${indexTopic < 0 ? "white" : "primary"}]`}
+                >{item}
+                </div>
+            );
+        })}
+    </div>
     const YesNoButtonEndComponent = () => (
         <div className="flex justify-center items-center space-x-5">
             {YesNoButtonEnd.map((item, i) => {
@@ -288,9 +318,11 @@ const Assistant = () => {
                             handleEnd(e, i)
                         }}
                         key={i}
-                        className={`bg-[${index === i ? "blue" : "#F2F4F5"
-                            }] w-[30%] flex justify-center items-center text-center text-[${index === i ? "white" : "primary"
-                            }] rounded-[12px] p-6 hover:cursor-pointer`}
+                        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                        text-[${index === i ? "white" : "primary"}] 
+                        bg-[${index === i ? "blue" : "#F2F4F5"}] 
+                        hover: bg - [${indexTopic < 0 ? "blue" : "#F2F4F5"}]
+                        hover:text-[${indexTopic < 0 ? "white" : "primary"}]`}
                     >
                         {item}
                     </div>
@@ -336,7 +368,6 @@ const Assistant = () => {
     useEffect(() => {
         handleAddText(text, textBot, countReply);
     }, [text, textBot]);
-
     // auto scroll end
     useEffect(() => {
         const boxchat = document.getElementById('boxchat')
@@ -382,29 +413,34 @@ const Assistant = () => {
                     </div>
                     <div className="flex justify-center items-center space-x-5 mb-5">
                         {YesNoButtonStart.map((item, i) => {
-
-
                             return (
-                                <div
+                                <button
                                     onClick={async (e) => {
                                         if (countReply < 0) handleStart(i)
-                                        if (i == 1) {
+                                        if (i === 1 && indexStart !== 0) {
                                             await setDisabled(false)
                                             await ref.current.focus() // bấm bao nhiu lần chat now cũng auto focus
                                         }
+                                        if (message.length === 0 && indexStart === 1) {
+                                            setIndexStart(i)
+                                            setCountReply(0)
+                                        }
                                     }}
                                     key={i}
-                                    className={`bg-[${indexStart === i ? "blue" : "#F2F4F5"
-                                        }] w-[30%] flex justify-center items-center text-center text-[${indexStart === i ? "white" : "primary"
-                                        }] rounded-[12px] p-6 hover:cursor-pointer hover:text-white hover:bg-[blue]`}
+                                    className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                                    bg-[${indexStart === i ? "blue" : "#F2F4F5"}] 
+                                    text-[${indexStart === i ? "white" : "primary"}] 
+                                    hover:bg-[${countReply < 1 ? "blue" : "#F2F4F5"}]
+                                    hover:text-[${countReply < 1 ? "white" : "primary"}]
+                                    `}
                                 >
                                     {item}
-                                </div>
+                                </button>
                             );
                         })}
                     </div>
                     <div className='box-wrap'>
-                        {/* Choose Objective */}
+                        {/*Script start Choose Objective */}
                         {indexStart === 0 && (
                             <>
                                 <div className="flex space-x-2">
@@ -423,9 +459,11 @@ const Assistant = () => {
                                                     handleObjective(e, i)
                                                 }}
                                                 key={i}
-                                                className={`bg-[${indexObj === i ? "blue" : "#F2F4F5"
-                                                    }] w-[30%] min-h-[100px] flex justify-center items-center text-center text-[${indexObj === i ? "white" : "primary"
-                                                    }] rounded-[12px] p-6 hover:cursor-pointer hover:text-white hover:bg-[blue]`}
+                                                className={`w-[30%] min-h-[100px] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                                                bg-[${indexObj === i ? "blue" : "#F2F4F5"}] 
+                                                text-[${indexObj === i ? "white" : "primary"}] 
+                                                hover:bg-[${indexObj < 0 ? "blue" : "#F2F4F5"}]
+                                                hover:text-[${indexObj < 0 ? "white" : "primary"}]`}
                                             >
                                                 {item}
                                             </div>
@@ -434,8 +472,8 @@ const Assistant = () => {
                                 </div>
                             </>
                         )}
-                        {/* Index =3 */}
                         <div id={"0"} className={""}></div>
+                        {/* Index =3 */}
                         {index3 && (
                             <>
                                 <div className="flex space-x-2">
@@ -463,8 +501,9 @@ const Assistant = () => {
                                 </div>
                             </>
                         )}
+                        {/* index=0 Select&Send xuất hiện lần 1 */}
                         {countTextBotExample >= 1 && indexObj === 0 && SelectAndSendComponent}
-                        {/* {countTextBotExample >= 3 && indexObj === 0 && indexYN === 1 && SelectAndSendComponent} */}
+                        {/* indexYN */}
                         {countTextBotExample >= 2 && indexObj === 0 && (
                             <div className="flex justify-center items-center space-x-5">
                                 {YesNoButton.map((item, i) => {
@@ -472,9 +511,12 @@ const Assistant = () => {
                                         <div
                                             onClick={(e) => handleYesNoButton(e, i)}
                                             key={i}
-                                            className={`bg-[${indexYN === i ? "blue" : "#F2F4F5"
-                                                }] w-[30%] flex justify-center items-center text-center text-[${indexYN === i ? "white" : "primary"
-                                                }] rounded-[12px] p-6 hover:cursor-pointer hover:text-white hover:bg-[blue]`}
+                                            className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                                            bg-[${indexYN === i ? "blue" : "#F2F4F5"}] 
+                                            text-[${indexYN === i ? "white" : "primary"}] 
+                                            hover:bg-[${indexYN < 0 ? "blue" : "#F2F4F5"}]
+                                            hover:text-[${indexYN < 0 ? "white" : "primary"}]
+                                                `}
                                         >
                                             {item}
                                         </div>
@@ -482,24 +524,12 @@ const Assistant = () => {
                                 })}
                             </div>
                         )}
-                        {/* index = 0 và call Topic1 */}
-                        {countTextBotExample >= 3 && indexStart === 0 && (
-                            <div className=" space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
-                                {Topic.map((item, i) => {
-                                    return (
-                                        <div
-                                            onClick={(e) => handleTopic(e, i)}
-                                            key={i}
-                                            className={`bg-[${indexTopic === i ? "blue" : "#F2F4F5"
-                                                }]  flex justify-center items-center text-center text-[${indexTopic === i ? "white" : "primary"
-                                                }] rounded-[12px] p-6 hover:cursor-pointer w-full hover:text-white hover:bg-[blue]`}
-                                        >
-                                            {item}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                        {/* YN=1 && Kindly choose again */}
+                        {/* {countTextBotExample >= 3 && indexObj === 0 && indexYN === 1 && SelectAndSendComponent} */}
+                        {/* index = 0 và indexYN = 0 và call Topic1 */}
+                        {countTextBotExample >= 3 && indexStart === 0 && indexYN === 0 && TopicComponent}
+                        {/* index = 0 và indexYN = 1 và call Topic1 */}
+                        {/* {countTextBotExample >= 3 && indexStart === 0 && indexYN === 1 && <TopicComponent />} */}
                         {/* Send Bot */}
                         {textOptionBot.length > 0 && (
                             <div className={`mx-auto grid grid-cols-4 gap-6 grid-rows-${textOptionBot.length / 4} `}>
@@ -508,28 +538,14 @@ const Assistant = () => {
                                         <button
                                             onClick={(e) => handleOption(e, i)}
                                             key={i}
-                                            className={`option bg-[${indexOptions === i ? "blue" : "#F2F4F5"
-                                                }] w-[full] flex justify-center items-center text-center text-[${indexOptions === i ? "white" : "primary"
-                                                }] rounded-[12px] p-6 hover:cursor-pointer hover:text-white hover:bg-[blue]`}>
+                                            className={`option w-[full] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                                            bg-[${indexOptions === i ? "blue" : "#F2F4F5"}] 
+                                            text-[${indexOptions === i ? "white" : "primary"}] 
+                                            hover:bg-[${indexOptions < 0 ? "blue" : "#F2F4F5"}]
+                                            hover:text-[${indexOptions < 0 ? "white" : "primary"}]
+                                            `}>
                                             {item}
                                         </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-                        {countTextBotExample >= 5 && (
-                            <div className="space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
-                                {Topic.map((item, i) => {
-                                    return (
-                                        <div
-                                            onClick={(e) => handleTopic2(e, i)}
-                                            key={i}
-                                            className={`bg-[${indexTopic2 === i ? "blue" : "#F2F4F5"
-                                                }] w-[full] flex justify-center items-center text-center text-[${indexTopic2 === i ? "white" : "primary"
-                                                }] rounded-[12px] p-6 hover:cursor-pointer hover:text-white hover:bg-[blue]`}
-                                        >
-                                            {item}
-                                        </div>
                                     );
                                 })}
                             </div>
@@ -540,11 +556,11 @@ const Assistant = () => {
                         {loading && <Loading />}
                     </div>
                 </div>
-                <div className="flex justify-end items-center space-x-5 bottom-2 right-8">
-                    <div className="bg-[#FFD4E4] w-[205px] h-[60px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
+                <div className="flex justify-end items-center space-x-5 mr-[15px]">
+                    <div className="bg-[#FFD4E4] w-[150px] h-[50px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
                     <div
                         onClick={() => window.location.reload()}
-                        className="bg-[blue] w-[205px] h-[60px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
+                        className="bg-[blue] w-[150px] h-[50px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
                 </div>
 
                 {/* Input Chat */}

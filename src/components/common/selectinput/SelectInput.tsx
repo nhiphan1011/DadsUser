@@ -11,7 +11,7 @@ interface ISelectInput {
 const SelectInput = ({ className = "", name, arr, dadsCoins, multiple, handleChange }: ISelectInput) => {
   return (
     <select
-      className={`${className} w-full min-w-[150px] px-[15px] min-h-[38px] bg-[#EBE1FF] text-xl font-light rounded-[12px] shadow-lg border-none relative`}
+      className={`${className} w-full min-w-[150px] px-[15px] min-h-[38px] bg-[#EBE1FF] text-[#120360] text-xl font-light rounded-[12px] shadow-lg border-none relative`}
       name={name}
       multiple={multiple}
       onChange={handleChange}
