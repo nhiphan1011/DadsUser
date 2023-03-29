@@ -13,12 +13,12 @@ import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton,
 const Assistant = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [index3, setIndex3] = useState<boolean>(false)
-    const [index, setIndex] = useState<number>();
+    const [showEnd, setShowEnd] = useState<boolean>(false)
+    const [indexEnd, setIndexEnd] = useState<number>(-1);
     const [indexStart, setIndexStart] = useState<number>(-1);
     const [indexObj, setIndexObj] = useState<number>(-1);
     const [indexYN, setIndexYN] = useState<number>(-1);
     const [indexTopic, setIndexTopic] = useState<number>(-1);
-    const [indexTopic2, setIndexTopic2] = useState<number>(-1);
     const [indexOptions, setIndexOptions] = useState<number>(-1);
     const [countReply, setCountReply] = useState<number>(-1);// sau 1 click count+=1
     const [countYN, setCountYN] = useState<number>(0)
@@ -31,7 +31,7 @@ const Assistant = () => {
     const [message, setMessage] = useState<string>("")
     const [email, setEmail] = useState<string>("")
     const [disabled, setDisabled] = useState<boolean>(true)
-    // console.log(loading, index3, index, indexStart, indexObj, indexYN, indexTopic, indexTopic2, indexOptions, countReply, text, textBot, textBotExample, countTextBotExample, selected, textOptionBot, message, email, disabled)
+    // console.log(loading, index3, index, indexStart, indexObj, indexYN, indexTopic, indexOptions, countReply, text, textBot, textBotExample, countTextBotExample, selected, textOptionBot, message, email, disabled)
     console.log('countReply', countReply)
     // console.log('index:', index)
     // console.log('text:', text)
@@ -42,7 +42,7 @@ const Assistant = () => {
     console.log('countTextBotExample:', countTextBotExample)
     // console.log('textOptionBot:', textOptionBot)
 
-    const post = async (act: string, skill: string, topic: string, question: string, topicLv2: string, message: string) => {
+    const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText("")
         setLoading(true)
         if (act && skill) {
@@ -66,25 +66,6 @@ const Assistant = () => {
             if (source) {
                 setTextBot(source.data.data)
             }
-        }
-        if (topicLv2) {
-            const _topicLv2 = encodeURIComponent(topicLv2)
-            const source = await new EventSource(`${API_URL}?topicLv2=${_topicLv2}`)
-            let count = 0
-            source.addEventListener('message', function (e) {
-                if (count < 5) {
-                    setTextBot(e.data)
-                    setText("")
-                    setCountReply(countReply => countReply + 1)
-                    setLoading(true)
-                    count += 1;
-                    if (count === 5) {
-                        setLoading(false)
-                        setTextBotExample(TextBotExample[6])
-                        source.close()
-                    }
-                }
-            });
         }
         if (message) {
             const _message = encodeURIComponent(message)
@@ -133,10 +114,10 @@ const Assistant = () => {
                 // call with promptquestion
                 // case index0
                 else if (indexObj === 0 && indexYN === 0 && countTextBotExample === 4) {
-                    post("", "", "", text, "", "")
+                    post("", "", "", text, "")
                 } else if (indexObj !== 0 && indexObj !== 3 && countReply === 3) {
                     // case index 1+2 countReply === 3 ; indexObj !== 0 ngăn case 0 khi ở countReply === 3 không bị call api
-                    post("", "", "", text, "", "")
+                    post("", "", "", text, "")
                 } else if (indexObj === 3 && countReply >= 1) setIndex3(true) // case Index =3
                 else if (indexObj === 0 && indexYN === 1 && countTextBotExample === 2) {// CASE NO in SELECT INDEX=0
                     console.log("RUNNING CASE NO")
@@ -184,14 +165,7 @@ const Assistant = () => {
             // if (countTextBotExample !== 4 && countTextBotExample < 5) setTextBotExample(TextBotExample[countTextBotExample]);
             if (countTextBotExample === 3) {
                 setTextBotExample(TextBotExample[countTextBotExample])
-                post("", "", text, "", "", "")
-            }
-            else if (countTextBotExample === 5) {
-                console.log("Running this case")
-                console.log(loading, "LOADING")
-                setLoading(true)
-                setTextBotExample(TextBotExample[countTextBotExample])
-                post("", "", "", "", text, "")
+                post("", "", text, "", "")
             }
         }
     };
@@ -239,7 +213,7 @@ const Assistant = () => {
         // lúc select&send xuất hiện lần đầu
         if (countReply === 1) {
             setLoading(true)
-            post(text, selected, "", "", "", "");
+            post(text, selected, "", "", "");
             setCountReply(countReply => countReply + 1)
         }
         // post lúc indexYN=1 (case No) và countReply = 3
@@ -274,23 +248,9 @@ const Assistant = () => {
             setCountReply((countReply) => countReply + 1);
         }
     }
-    const handleTopic2 = (e: any, i: number) => {
-        if (countTextBotExample === 5) {
-            setIndexTopic2(i);
-            handleChangeText(e);
-            setCountReply((countReply) => countReply + 1);
-        }
-    }
-    const handleEnd = (e: any, i: number) => {
-        if (countTextBotExample === 6) {
-            setCountReply((countReply) => countReply + 1);
-            setIndex(i);
-            setLoading(true)
-        }
-    }
     const handleChat = async () => {
         const a = await setText(message)
-        post("", "", "", "", "", message)
+        post("", "", "", "", message)
         setMessage("")
     }
     const TopicComponent = <div className=" space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
@@ -309,27 +269,6 @@ const Assistant = () => {
             );
         })}
     </div>
-    const YesNoButtonEndComponent = () => (
-        <div className="flex justify-center items-center space-x-5">
-            {YesNoButtonEnd.map((item, i) => {
-                return (
-                    <div
-                        onClick={(e) => {
-                            handleEnd(e, i)
-                        }}
-                        key={i}
-                        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-                        text-[${index === i ? "white" : "primary"}] 
-                        bg-[${index === i ? "blue" : "#F2F4F5"}] 
-                        hover: bg - [${indexTopic < 0 ? "blue" : "#F2F4F5"}]
-                        hover:text-[${indexTopic < 0 ? "white" : "primary"}]`}
-                    >
-                        {item}
-                    </div>
-                );
-            })}
-        </div>
-    )
     const Loading = () => (
         <div className="flex space-x-2 my-[10px]">
             <img src="/static/media/Bot.e33d536bdd412e738363.png" alt="" className="w-[50px]    -[50px] object-contain" />
@@ -473,7 +412,7 @@ const Assistant = () => {
                             </>
                         )}
                         <div id={"0"} className={""}></div>
-                        {/* Index =3 */}
+                        {/* index3 & input*/}
                         {index3 && (
                             <>
                                 <div className="flex space-x-2">
@@ -526,8 +465,12 @@ const Assistant = () => {
                         )}
                         {/* YN=1 && Kindly choose again */}
                         {/* {countTextBotExample >= 3 && indexObj === 0 && indexYN === 1 && SelectAndSendComponent} */}
-                        {/* index = 0 và indexYN = 0 và call Topic1 */}
-                        {countTextBotExample >= 3 && indexStart === 0 && indexYN === 0 && TopicComponent}
+
+                        {/* index0 và indexYN0 và call Topic1 */}
+                        {/* {countTextBotExample >= 3 && indexStart === 0 && indexYN === 0 && TopicComponent} */}
+                        {/* Gọi chung cho index = 0 , 1 , 2 */}
+                        {countTextBotExample >= 3 && indexObj !== 3 && TopicComponent}
+
                         {/* index = 0 và indexYN = 1 và call Topic1 */}
                         {/* {countTextBotExample >= 3 && indexStart === 0 && indexYN === 1 && <TopicComponent />} */}
                         {/* Send Bot */}
@@ -550,19 +493,51 @@ const Assistant = () => {
                                 })}
                             </div>
                         )}
-                        {indexObj === 0 && countReply >= 11 && <YesNoButtonEndComponent />}
-                        {indexObj === 1 && countReply >= 9 && <YesNoButtonEndComponent />}
-                        {indexObj === 2 && countReply >= 9 && <YesNoButtonEndComponent />}
+                        {/* Early demo index 012 */}
+                        {countTextBotExample >= 5 && indexObj !== 3 && (
+                            <button
+                                onClick={() => setShowEnd(true)}
+                                className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 m-auto my-5 hover:cursor-pointer
+                                    bg-[${indexEnd > 0 ? "blue" : "#F2F4F5"}] 
+                                    text-[${indexEnd > 0 ? "white" : "primary"}] 
+                                    hover:bg-[${indexEnd < 0 ? "blue" : "#F2F4F5"}]
+                                    hover:text-[${indexEnd < 0 ? "white" : "primary"}]
+                                    `}
+                            >
+                                Request a early demo
+                            </button>
+                        )}
+                        {/* input end in index012 */}
+                        {showEnd && (
+                            <div className="flex max-w-[500px] mx-auto space-x-5  mb-5 justify-center items-center">
+                                <input
+                                    className='w-full min-w-[150px] px-[25px]  min-h-[38px] bg-[#EBE1FF] text-xl font-light rounded-[12px] shadow-lg border-none'
+                                    placeholder='Enter your Email here'
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    type="email"
+                                />
+                                <button
+                                    className='min-w-[90px] rounded-[12px] p-4 bg-[#FF008A] text-white hover:cursor-pointer '
+                                    onClick={async (e) => {
+                                        e.preventDefault()
+                                        localStorage.setItem("mailUser", email)
+                                        setTextBotExample("Submit successfully, kindly wait few days, my team will contact you via email")
+                                    }}
+                                >Submit</button>
+                            </div>
+
+                        )}
                         {loading && <Loading />}
                     </div>
                 </div>
+                {/* button feedback and reset */}
                 <div className="flex justify-end items-center space-x-5 mr-[15px]">
                     <div className="bg-[#FFD4E4] w-[150px] h-[50px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
                     <div
                         onClick={() => window.location.reload()}
                         className="bg-[blue] w-[150px] h-[50px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
                 </div>
-
                 {/* Input Chat */}
                 <div className='w-full flex justify-center rounded-sm py-[10px]'>
                     <input
