@@ -1,2 +1,2 @@
 export { default as TypingDots } from './TypingDots'
-export * from './Text'
+export { default as Reply } from './Reply'

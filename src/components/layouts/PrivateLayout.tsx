@@ -29,8 +29,8 @@ const Layout = () => {
         </>
 
       ) : (
-        <div className="w-[100%]">
-          <main className="w-full" >
+        <div className="w-[100%] h-[100%]">
+          <main className="w-full " >
             <Outlet />
           </main>
           <Footer />

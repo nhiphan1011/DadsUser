@@ -6,7 +6,7 @@ import Bot from "../../../assets/image/Bot.png";
 import ButtonSendToBot from "../../../assets/image/ButtonSendToBot.png";
 import User from "../../../assets/image/User.png";
 import { API_URL } from "../constants";
-import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonEnd, YesNoButtonStart } from 'constant';
+import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonEnd, YesNoButtonStart, TextBotExamYN } from 'constant';
 
 
 // gom state, ứng dụng spread 
@@ -18,10 +18,11 @@ const Assistant = () => {
     const [indexStart, setIndexStart] = useState<number>(-1);
     const [indexObj, setIndexObj] = useState<number>(-1);
     const [indexYN, setIndexYN] = useState<number>(-1);
+    const [indexYN1, setIndexYN1] = useState<number>(-1);
     const [indexTopic, setIndexTopic] = useState<number>(-1);
     const [indexOptions, setIndexOptions] = useState<number>(-1);
     const [countReply, setCountReply] = useState<number>(-1);// sau 1 click count+=1
-    const [countYN, setCountYN] = useState<number>(0)
+    const [countYN, setCountYN] = useState<number>(0)// dùng để đếm caseYN
     const [text, setText] = useState<string>("");
     const [textBot, setTextBot] = useState<string | any>("");
     const [textBotExample, setTextBotExample] = useState<string>("");
@@ -38,7 +39,8 @@ const Assistant = () => {
     // console.log('textBot:', textBot)
     // console.log('message:', message)
     // console.log('indexStart:', indexStart)
-    // console.log('textBotExample:', textBotExample)
+    console.log('countYN:', countYN)
+    console.log('textBotExample:', textBotExample)
     console.log('countTextBotExample:', countTextBotExample)
     // console.log('textOptionBot:', textOptionBot)
 
@@ -106,26 +108,21 @@ const Assistant = () => {
 
             // CASE SELECT INDEX=0
             if (indexStart === 0) {
-                if (indexObj === 0 && countReply === 1) {
-                    setTextBotExample(TextBotExample[countTextBotExample])
-                } else if (indexObj === 0 && indexYN === 0 && countTextBotExample === 2) {
-                    setTextBotExample(TextBotExample[countTextBotExample])
-                }
-                // call with promptquestion
-                // case index0
-                else if (indexObj === 0 && indexYN === 0 && countTextBotExample === 4) {
-                    post("", "", "", text, "")
-                } else if (indexObj !== 0 && indexObj !== 3 && countReply === 3) {
-                    // case index 1+2 countReply === 3 ; indexObj !== 0 ngăn case 0 khi ở countReply === 3 không bị call api
-                    post("", "", "", text, "")
-                } else if (indexObj === 3 && countReply >= 1) setIndex3(true) // case Index =3
-                else if (indexObj === 0 && indexYN === 1 && countTextBotExample === 2) {// CASE NO in SELECT INDEX=0
-                    console.log("RUNNING CASE NO")
-                    setTextBotExample(TextBotExample[7])
-                } else if ((indexObj === 1 || indexObj === 2) && countReply === 1) {
+                if (indexObj === 0 && countReply === 1) setTextBotExample(TextBotExample[countTextBotExample])
+                // 
+                else if (indexObj === 0 && indexYN === 0 && countTextBotExample === 2) setTextBotExample(TextBotExample[countTextBotExample])
+                // call with promptquestion Start0 YN0
+                else if (indexObj === 0 && indexYN === 0 && countTextBotExample === 4) post("", "", "", text, "")
+                // CASE NO in start0, YN1, countYN0
+                else if (indexObj === 0 && indexYN === 1 && countYN === 0) setTextBotExample(TextBotExamYN[countYN])
+
+                //call with promptquestion case index 1+2 countReply === 3 ; indexObj !== 0 ngăn case 0 khi ở countReply === 3 không bị call api
+                else if (indexObj !== 0 && indexObj !== 3 && countReply === 3) post("", "", "", text, "")
+                else if ((indexObj === 1 || indexObj === 2) && countReply === 1) {
                     setCountTextBotExample(countTextBotExample => countTextBotExample + 2)
                     setTextBotExample(TextBotExample[`${countTextBotExample + 2}`])
-                }
+                } // case Index =3
+                else if (indexObj === 3 && countReply >= 1) setIndex3(true)
             }
         }
         if (messageBot) {
@@ -144,12 +141,16 @@ const Assistant = () => {
             document.getElementsByClassName("box-wrap")[0].appendChild(botDiv);
             document.getElementById(`${countReply}bot`)?.appendChild(nodeImgBot);
             document.getElementById(`${countReply}bot`)?.appendChild(elementBotDivChildren);
-            // Script (Nochat)
-            if (indexStart === 0) {
+            if (indexStart === 0) {// Script (Nochat)
                 if (indexObj === 0) {
                     // countReply = 2 ,5 Case0 ; 
-                    if (countReply === 2 || countReply === 5) {
-                        setTextBotExample(TextBotExample[countTextBotExample])
+                    if (countReply === 2) setTextBotExample(TextBotExample[countTextBotExample])
+                    // ask again or end lần 1, countYN = 0
+                    else if (countReply === 5 && countYN === 0) console.log("ask again or end")
+                    // setTextBotExample(TextBotExample[countTextBotExample])
+                    else if (countReply === 3 && countYN === 1) {
+
+                        setTextBotExample(TextBotExample[1])
                     }
                 }
                 //Case1+2 
@@ -190,8 +191,10 @@ const Assistant = () => {
         document.getElementsByClassName("box-wrap")[0].appendChild(botDiv);
         document.getElementById(`${countReply}exam`)?.appendChild(nodeImgBot);
         document.getElementById(`${countReply}exam`)?.appendChild(elementBotDivChildren);
-        // if (countYN === 1 && )
-        setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
+        // chặn case chọn No lần 1 để hiẻn lên Kindly choose again
+        if (countReply === 3 && countYN >= 0 && indexYN === 1) console.log("Dont count textbotexam1")
+        else if (countReply === 4 && countYN >= 0) console.log("Dont count textbotexam2")
+        else setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const handleStart = (i: number) => {
         // ref.current.focus()
@@ -209,7 +212,7 @@ const Assistant = () => {
         }
         // case YN=1 và call lại lần 1
     }
-    const handleSend = (e: any) => {
+    const handleSend = async (e: any) => {
         // lúc select&send xuất hiện lần đầu
         if (countReply === 1) {
             setLoading(true)
@@ -217,21 +220,19 @@ const Assistant = () => {
             setCountReply(countReply => countReply + 1)
         }
         // post lúc indexYN=1 (case No) và countReply = 3
-        // else if (indexYN === 1 && countReply === 3) {
-        //     setLoading(true)
-        //     post(text, selected, "", "", "", "");
-        //     setCountReply(countReply => countReply + 1)
-        // }
-    }
-    const handleYesNoButton = (e: any, i: number) => {
-        // Yes/No lần 1 
-        if (countTextBotExample === 2) {
-            setIndexYN(i);
-            handleChangeText(e);
+        else if (indexYN === 1 && countReply === 3) {
+            setLoading(true)
             setCountReply(countReply => countReply + 1)
-            setCountYN(countYN => countYN + 1)// đềm số lần YN
+            post(text, selected, "", "", "");
         }
-
+    }
+    const handleYesNoButton = async (e: any, i: number) => {
+        // Chọn yes hay no cũng dc
+        setIndexYN(i);
+        await handleChangeText(e);
+        setCountReply(countReply => countReply + 1)
+        // Yes/No lần đầu, Khi chọn NO, chỉ tăng countYN khi chọn NO
+        if (i === 1) setCountYN(countYN => countYN + 1)
     }
     const handleTopic = (e: any, i: number) => {
         if (countTextBotExample === 3) {
@@ -241,7 +242,7 @@ const Assistant = () => {
         }
     }
     const handleOption = (e: any, i: number) => {
-        // counReply=4 cho Case index0 ; =2 và khác 3 cho case index1&2
+        // counReply=4 cho start0 YN0 ; counReply=2 và khác 3 cho case index1&2
         if (countTextBotExample === 4 && countReply <= 4 && countReply !== 3) {
             setIndexOptions(i);
             handleChangeText(e);
@@ -253,6 +254,28 @@ const Assistant = () => {
         post("", "", "", "", message)
         setMessage("")
     }
+    const YesNoButtonComponent = (
+        <div className="flex justify-center items-center space-x-5">
+            {YesNoButton.map((item, i) => {
+                return (
+                    <div
+                        onClick={(e) => {
+                            if (countTextBotExample === 2) handleYesNoButton(e, i)
+                        }}
+                        key={i}
+                        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                        bg-[${indexYN === i ? "#EBE1FF" : "#F2F4F5"}] 
+                        text-[${indexYN === i ? "#120360" : "primary"}] 
+                        hover:bg-[${indexYN < 0 ? "#EBE1FF" : "#F2F4F5"}]
+                        hover:text-[${indexYN < 0 ? "#120360" : "primary"}]
+                            `}
+                    >
+                        {item}
+                    </div>
+                );
+            })}
+        </div>
+    )
     const TopicComponent = <div className=" space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
         {Topic.map((item, i) => {
             return (
@@ -260,10 +283,10 @@ const Assistant = () => {
                     onClick={(e) => handleTopic(e, i)}
                     key={i}
                     className={`flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer w-full
-                        bg-[${indexTopic === i ? "blue" : "#F2F4F5"}] 
-                        text-[${indexTopic === i ? "white" : "primary"}] 
-                        hover:bg-[${indexTopic < 0 ? "blue" : "#F2F4F5"}]
-                        hover:text-[${indexTopic < 0 ? "white" : "primary"}]`}
+                        bg-[${indexTopic === i ? "#EBE1FF" : "#F2F4F5"}] 
+                        text-[${indexTopic === i ? "#120360" : "primary"}] 
+                        hover:bg-[${indexTopic < 0 ? "#EBE1FF" : "#F2F4F5"}]
+                        hover:text-[${indexTopic < 0 ? "#120360" : "primary"}]`}
                 >{item}
                 </div>
             );
@@ -367,10 +390,10 @@ const Assistant = () => {
                                     }}
                                     key={i}
                                     className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-                                    bg-[${indexStart === i ? "blue" : "#F2F4F5"}] 
-                                    text-[${indexStart === i ? "white" : "primary"}] 
-                                    hover:bg-[${countReply < 1 ? "blue" : "#F2F4F5"}]
-                                    hover:text-[${countReply < 1 ? "white" : "primary"}]
+                                    bg-[${indexStart === i ? "#EBE1FF" : "#F2F4F5"}] 
+                                    text-[${indexStart === i ? "#120360" : "primary"}] 
+                                    hover:bg-[${countReply < 1 ? "#EBE1FF" : "#F2F4F5"}]
+                                    hover:text-[${countReply < 1 ? "#120360" : "primary"}]
                                     `}
                                 >
                                     {item}
@@ -399,10 +422,10 @@ const Assistant = () => {
                                                 }}
                                                 key={i}
                                                 className={`w-[30%] min-h-[100px] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-                                                bg-[${indexObj === i ? "blue" : "#F2F4F5"}] 
-                                                text-[${indexObj === i ? "white" : "primary"}] 
-                                                hover:bg-[${indexObj < 0 ? "blue" : "#F2F4F5"}]
-                                                hover:text-[${indexObj < 0 ? "white" : "primary"}]`}
+                                                bg-[${indexObj === i ? "#EBE1FF" : "#F2F4F5"}] 
+                                                text-[${indexObj === i ? "#120360" : "primary"}] 
+                                                hover:bg-[${indexObj < 0 ? "#EBE1FF" : "#F2F4F5"}]
+                                                hover:text-[${indexObj < 0 ? "#120360" : "primary"}]`}
                                             >
                                                 {item}
                                             </div>
@@ -442,35 +465,16 @@ const Assistant = () => {
                         )}
                         {/* index=0 Select&Send xuất hiện lần 1 */}
                         {countTextBotExample >= 1 && indexObj === 0 && SelectAndSendComponent}
-                        {/* indexYN */}
-                        {countTextBotExample >= 2 && indexObj === 0 && (
-                            <div className="flex justify-center items-center space-x-5">
-                                {YesNoButton.map((item, i) => {
-                                    return (
-                                        <div
-                                            onClick={(e) => handleYesNoButton(e, i)}
-                                            key={i}
-                                            className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-                                            bg-[${indexYN === i ? "blue" : "#F2F4F5"}] 
-                                            text-[${indexYN === i ? "white" : "primary"}] 
-                                            hover:bg-[${indexYN < 0 ? "blue" : "#F2F4F5"}]
-                                            hover:text-[${indexYN < 0 ? "white" : "primary"}]
-                                                `}
-                                        >
-                                            {item}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                        {/* YN=1 && Kindly choose again */}
-                        {/* {countTextBotExample >= 3 && indexObj === 0 && indexYN === 1 && SelectAndSendComponent} */}
-
+                        {/* YesNo Button xuất hiện lần đầu */}
+                        {countTextBotExample >= 2 && countYN >= 0 && indexObj === 0 && YesNoButtonComponent}
+                        {/* YN Button vẫn xuất hiện khi countYN0 và indexYN1 && Kindly choose again*/}
+                        {countYN >= 1 && indexYN === 1 && countReply >= 3 && SelectAndSendComponent}
+                        {/* YN button lần 2 , YN1*/}
+                        {/* {countYN >= 1 && indexYN === 1 && countReply >= 4 && YesNoButtonComponent} */}
                         {/* index0 và indexYN0 và call Topic1 */}
                         {/* {countTextBotExample >= 3 && indexStart === 0 && indexYN === 0 && TopicComponent} */}
-                        {/* Gọi chung cho index = 0 , 1 , 2 */}
-                        {countTextBotExample >= 3 && indexObj !== 3 && TopicComponent}
-
+                        {/* Gọi chung Topoc cho index = 0 , 1 , 2 và chặn case indexYN1 count3*/}
+                        {countTextBotExample >= 3 && indexObj !== 3 && indexYN === 0 && TopicComponent}
                         {/* index = 0 và indexYN = 1 và call Topic1 */}
                         {/* {countTextBotExample >= 3 && indexStart === 0 && indexYN === 1 && <TopicComponent />} */}
                         {/* Send Bot */}
@@ -482,10 +486,10 @@ const Assistant = () => {
                                             onClick={(e) => handleOption(e, i)}
                                             key={i}
                                             className={`option w-[full] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-                                            bg-[${indexOptions === i ? "blue" : "#F2F4F5"}] 
-                                            text-[${indexOptions === i ? "white" : "primary"}] 
-                                            hover:bg-[${indexOptions < 0 ? "blue" : "#F2F4F5"}]
-                                            hover:text-[${indexOptions < 0 ? "white" : "primary"}]
+                                            bg-[${indexOptions === i ? "#EBE1FF" : "#F2F4F5"}] 
+                                            text-[${indexOptions === i ? "#120360" : "primary"}] 
+                                            hover:bg-[${indexOptions < 0 ? "#EBE1FF" : "#F2F4F5"}]
+                                            hover:text-[${indexOptions < 0 ? "#120360" : "primary"}]
                                             `}>
                                             {item}
                                         </button>
@@ -498,11 +502,10 @@ const Assistant = () => {
                             <button
                                 onClick={() => setShowEnd(true)}
                                 className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 m-auto my-5 hover:cursor-pointer
-                                    bg-[${indexEnd > 0 ? "blue" : "#F2F4F5"}] 
-                                    text-[${indexEnd > 0 ? "white" : "primary"}] 
-                                    hover:bg-[${indexEnd < 0 ? "blue" : "#F2F4F5"}]
-                                    hover:text-[${indexEnd < 0 ? "white" : "primary"}]
-                                    `}
+                                    bg-[${indexEnd > 0 ? "#EBE1FF" : "#F2F4F5"}] 
+                                    text-[${indexEnd > 0 ? "#120360" : "primary"}] 
+                                    hover:bg-[${indexEnd < 0 ? "#EBE1FF" : "#F2F4F5"}]
+                                    hover:text-[${indexEnd < 0 ? "#120360" : "primary"}]`}
                             >
                                 Request a early demo
                             </button>
