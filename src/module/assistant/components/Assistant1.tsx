@@ -482,7 +482,7 @@ const Assistant = () => {
                             return (
                                 <button
                                     onClick={async (e) => {
-                                        if (countReply < 0) {
+                                        if (countReply < 0 && i === 1) {
                                             await setDisabled(false)
                                             await ref.current.focus()
                                             handleStart(i)
