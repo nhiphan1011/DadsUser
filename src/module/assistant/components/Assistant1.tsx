@@ -73,11 +73,11 @@ const Assistant = () => {
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
@@ -90,11 +90,11 @@ const Assistant = () => {
         }
         if (question) {
             const _question = encodeURIComponent(question)
-            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Data question" }))
+            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            // setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
@@ -484,7 +484,6 @@ const Assistant = () => {
                                     onClick={async (e) => {
                                         if (countReply < 0) {
                                             if (i === 1) {
-
                                                 await setDisabled(false)
                                                 await ref.current.focus()
                                             }
