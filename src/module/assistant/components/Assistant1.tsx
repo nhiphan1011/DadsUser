@@ -1,9 +1,11 @@
 
 
+import { useEffect, useRef, useState } from "react";
 import Typewriter from 'typewriter-effect';
+import { notification } from "antd";
+import type { NotificationPlacement } from 'antd/es/notification/interface';
 import axios from "axios";
 import { SelectInput, TypingDots, Reply } from "components";
-import { useEffect, useRef, useState } from "react";
 import Bot from "../../../assets/image/Bot.png";
 import ButtonSendToBot from "../../../assets/image/ButtonSendToBot.png";
 import User from "../../../assets/image/User.png";
@@ -51,7 +53,9 @@ const Assistant = () => {
     const [boxChat6, setBoxChat6] = useState<Array<any>>([])
     const [boxChat7, setBoxChat7] = useState<Array<any>>([])
     const [boxChatEnd, setBoxChatEnd] = useState<Array<any>>([])
-    console.log('index:', index)
+
+    const [api, contextHolder] = notification.useNotification();
+    // console.log('index:', index)
     // console.log('text:', text)
     // console.log('boxChat1:', boxChat1)
     // console.log('boxChat2:', boxChat2)
@@ -63,7 +67,7 @@ const Assistant = () => {
     // console.log('boxChatEnd:', boxChatEnd)
     // // console.log('textBot:', textBot)
     // console.log('message:', message)
-    // console.log('countReply', countReply)
+    console.log('countReply', countReply)
     // console.log('countYN:', countYN)
     // console.log('countTextBotExample:', countTextBotExample)
     // console.log('value:', value)
@@ -73,28 +77,28 @@ const Assistant = () => {
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
-            const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            if (source) {
-                setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            }
-            // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
+            // const source = await axios.get(`${API_URL}?topic=${_topic}`)
+            // if (source) {
+            //     setValue(prev => ({ ...prev, optionBot: source.data.data }))
+            // }
+            setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
         if (question) {
             const _question = encodeURIComponent(question)
-            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Data question" }))
+            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
@@ -270,6 +274,13 @@ const Assistant = () => {
         setText(prev => ({ ...prev, user: e.target.textContent }));
         setCountReply(countReply => countReply + 1);
     }
+    const handleSendEmail = () => {
+        refInput.current.focus()
+        axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
+            email: value.email
+        }).then(() => setBoxChatEnd(prev => ([...prev, { user: "exam", value: "Submit successfully, kindly wait few days, my team will contact you via email" }]))
+        ).catch(() => openNotification("top"))
+    }
     const handleChat = async () => {
         await setText((prev => ({ ...prev, user: message })))
         post("", "", "", "", message)
@@ -392,41 +403,47 @@ const Assistant = () => {
         />
         <button
             className='min-w-[90px] rounded-[12px] p-4 bg-[#FF008A] text-white hover:cursor-pointer '
-            id="sendE"
+            id="sendEmail"
             onClick={async (e) => {
-                // e.preventDefault()
-                // localStorage.setItem("mailUser", value.email)
-                axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
-                    email: value.email
-                }).then(() => setBoxChatEnd(prev => ([...prev, { user: "exam", value: "Submit successfully, kindly wait few days, my team will contact you via email" }]))
-                ).catch(() => setBoxChatEnd(prev => ([...prev, { user: "exam", value: "Your email is invalid" }])))
+                if (index.obj === 0) {
+                    if (index.YN === 0 && countReply === 6) handleSendEmail()
+                    else if (index.YN === 1 && countReply === 8) handleSendEmail()
+                } else if (index.obj === 1 && countReply === 3) handleSendEmail()
+                else if (countReply === 1 && index.obj === 2) handleSendEmail()
             }}
         >Submit</button>
-    </div>
+    </div >
+    const openNotification = (placement: NotificationPlacement) => {
+        api.warning({
+            message: `Notification`,
+            description:
+                "Your email is invalid",
+            placement
+        });
+    };
     useEffect(() => {
         const handleEnter = (event: any) => {
             if (event.key === "Enter") {
-                console.log("Event", event)
-                // event.preventDefault();
+                event.preventDefault();
                 document.getElementById("send")?.click();
             }
         };
         ref.current?.addEventListener('keydown', handleEnter);
         return () => {
-            window.removeEventListener('keydown', handleEnter)
+            ref.current?.removeEventListener('keydown', handleEnter)
         }
     }, [])
     useEffect(() => {
-        const handleEnterE = (event: any) => {
+        const handleEnterEmail = (event: any) => {
             if (event.key === "Enter") {
                 console.log("EventE", event)
-                // event.preventDefault();
-                document.getElementById("sendE")?.click();
+                event.preventDefault();
+                document.getElementById("sendEmail")?.click();
             }
         };
-        refInput.current?.addEventListener('keydown', handleEnterE);
+        refInput.current?.addEventListener('keydown', handleEnterEmail);
         return () => {
-            window.removeEventListener('keydown', handleEnterE)
+            refInput.current?.removeEventListener('keydown', handleEnterEmail)
         }
     }, [])
     useEffect(() => {
@@ -438,39 +455,41 @@ const Assistant = () => {
     // auto scroll end
     useEffect(() => {
         const boxchat = document.getElementById('boxchat')
+        const boxwrap = document.getElementById('boxwrap')
         const sH = boxchat?.scrollHeight
-        const cH = boxchat?.clientHeight
-        if (sH && cH && sH > cH) {
-            boxchat.scrollTo(0, boxchat?.scrollHeight);
-        }
+        // const cH = boxchat?.clientHeight
+        // if (sH && cH && sH > cH) 
+        if (sH && sH > 197) boxwrap?.scrollTo(0, boxchat?.scrollHeight);
+
     }, [document.getElementById('boxchat')?.scrollHeight])
-
     return (
-        <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col md:flex-row overflow-y-scroll">
-            {/* Avatar Bot */}
-            <div className="w-full md:w-[40%] py-6 px-8">
-                <p className="font-bold">Alley</p>
-                <p>AI Assistant</p>
-                <div className="flex flex-row">
-                    <div className="w-[35%]"><img src={Bot} alt="bot" /></div>
-                    <div className="w-[75%]">
-                        <div className="bg-[#F2F4F5] p-4 mb-[20px] text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
-                            <Typewriter
-                                options={{
-                                    delay: 50
-                                }}
-                                onInit={(typewriter) => {
-                                    typewriter.typeString(TextBotExam).start()
-                                }}
-                            />
-                        </div>
+        <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col justify-between overflow-y-scroll">
+            {contextHolder}
+            <div id="boxwrap"
+                className='w-full md:h-[calc(100vh-67.5px-62px)] flex flex-col md:flex-row overflow-y-scroll'>
+                {/* Avatar Bot */}
+                <div className="w-full md:w-[40%] py-6 px-8">
+                    <p className="font-bold">Alley</p>
+                    <p>AI Assistant</p>
+                    <div className="flex flex-row">
+                        <div className="w-[35%]"><img src={Bot} alt="bot" /></div>
+                        <div className="w-[75%]">
+                            <div className="bg-[#F2F4F5] p-4 mb-[20px] text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
+                                <Typewriter
+                                    options={{
+                                        delay: 50
+                                    }}
+                                    onInit={(typewriter) => {
+                                        typewriter.typeString(TextBotExam).start()
+                                    }}
+                                />
+                            </div>
 
+                        </div>
                     </div>
                 </div>
-            </div>
-            {/* Box Chat`` */}
-            <div className="w-full flex flex-col md:h-full md: justify-between">
-                <div id="boxchat" className='p-8 transition md:overflow-y-scroll overflow-x-hidden relative'>
+                {/* Box Chat`` */}
+                <div className='w-full p-8 transition '>
                     <div className="flex space-x-2">
                         <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
                         <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
@@ -508,7 +527,7 @@ const Assistant = () => {
                             );
                         })}
                     </div>
-                    <div className='box-wrap'>
+                    <div id="boxchat" className='box-wrap'>
                         {/*Script start Choose Objective */}
                         {index.start === 0 && (
                             <>
@@ -573,39 +592,39 @@ const Assistant = () => {
                         {loading && <Loading />}
                     </div>
                 </div>
-                {/* button feedback and reset */}
-
-                <div>
-                    <div className="flex justify-end items-center space-x-5 mr-[15px]">
-                        <div className="bg-[#FFD4E4] w-[150px] h-[50px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
-                        <div
-                            onClick={() => window.location.reload()}
-                            className="bg-[blue] w-[150px] h-[50px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
-                    </div>
-                    {/* Input Chat */}
-                    <div className='w-full flex justify-center rounded-sm py-[10px]'>
-                        <input
-                            disabled={disabled}
-                            ref={ref}
-                            className='w-full bg-[#F2F4F5] px-[20px] py-[10px] rounded-[20px]'
-                            placeholder='Type something to chat with Alley...'
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
-                        <button
-                            id="send"
-                            className='h-[38px] text-2xl p-3 text-[blue] rounded-[20px] hover:bg-[blue] hover:text-white'
-                            onClick={(e) => {
-                                e.preventDefault()
-                                setCountReply(countReply => countReply + 1)
-                                if (countReply >= 0) handleChat()
-                                setDisabled(true)
-                            }}
-                        >SEND</button>
-                    </div>
-                </div>
-
             </div>
+
+            {/* button feedback and reset */}
+            <div className='boxchat-footer md:w-[70%] md:ml-auto mt-[10px]'>
+                <div className="flex justify-end items-center space-x-5 mr-[15px]">
+                    <div className="bg-[#FFD4E4] w-[150px] h-[50px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
+                    <div
+                        onClick={() => window.location.reload()}
+                        className="bg-[blue] w-[150px] h-[50px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
+                </div>
+                {/* Input Chat */}
+                <div className='w-full flex justify-center rounded-sm py-[10px] '>
+                    <input
+                        disabled={disabled}
+                        ref={ref}
+                        className='w-full bg-[#F2F4F5] px-[20px] py-[10px] rounded-[20px]'
+                        placeholder='Type something to chat with Alley...'
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    />
+                    <button
+                        id="send"
+                        className='h-[38px] text-2xl p-3 text-[blue] rounded-[20px] hover:bg-[blue] hover:text-white'
+                        onClick={(e) => {
+                            e.preventDefault()
+                            setCountReply(countReply => countReply + 1)
+                            if (countReply >= 0) handleChat()
+                            setDisabled(true)
+                        }}
+                    >SEND</button>
+                </div>
+            </div>
+
         </div >
     );
 };
