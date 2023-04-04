@@ -77,28 +77,28 @@ const Assistant = () => {
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
-            // const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            // if (source) {
-            //     setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            // }
-            setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
+            const source = await axios.get(`${API_URL}?topic=${_topic}`)
+            if (source) {
+                setValue(prev => ({ ...prev, optionBot: source.data.data }))
+            }
+            // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
         if (question) {
             const _question = encodeURIComponent(question)
-            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Data question" }))
+            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            // setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
