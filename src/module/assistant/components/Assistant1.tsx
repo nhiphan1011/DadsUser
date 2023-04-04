@@ -275,7 +275,6 @@ const Assistant = () => {
         setCountReply(countReply => countReply + 1);
     }
     const handleSendEmail = () => {
-        refInput.current.focus()
         axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
             email: value.email
         }).then(() => setBoxChatEnd(prev => ([...prev, { user: "exam", value: "Submit successfully, kindly wait few days, my team will contact you via email" }]))

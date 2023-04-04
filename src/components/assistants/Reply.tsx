@@ -28,7 +28,7 @@ export default function Reply({ data }: props) {
                         className="w-[50px] h-[50px] object-contain"
                         src={Bot} />
                     <div className="max-w-[550px] h-[100%] p-4 rounded-tr-[16px] rounded-l-[16px] my-5 text-primary bg-[#F2F4F5]">
-                        {value}
+                        <p dangerouslySetInnerHTML={{ __html: value }}></p>
                     </div>
                 </>
             )}
