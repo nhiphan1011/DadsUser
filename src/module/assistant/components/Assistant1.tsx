@@ -57,7 +57,6 @@ const Assistant = () => {
     const [boxChat6, setBoxChat6] = useState<Array<any>>([])
     const [boxChat7, setBoxChat7] = useState<Array<any>>([])
     const [boxChatEnd, setBoxChatEnd] = useState<Array<any>>([])
-
     const [api, contextHolder] = notification.useNotification();
     console.log('index:', index)
     console.log('state:', state)
@@ -65,9 +64,9 @@ const Assistant = () => {
     // console.log('boxChat2:', boxChat2)
     // console.log('boxChat3:', boxChat3)
     // console.log('boxChat4:', boxChat4)
-    // console.log('boxChat5:', boxChat5)
-    // console.log('boxChat6:', boxChat6)
-    // console.log('boxChat7:', boxChat7)
+    console.log('boxChat5:', boxChat5)
+    console.log('boxChat6:', boxChat6)
+    console.log('boxChat7:', boxChat7)
     // console.log('boxChatEnd:', boxChatEnd)
     console.log('text:', text)
     // console.log('message:', message)
@@ -81,37 +80,37 @@ const Assistant = () => {
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
-            const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            if (source) {
-                setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            }
-            // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
+            // const source = await axios.get(`${API_URL}?topic=${_topic}`)
+            // if (source) {
+            //     setValue(prev => ({ ...prev, optionBot: source.data.data }))
+            // }
+            setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
         if (question) {
             const _question = encodeURIComponent(question)
-            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            setText(prev => ({ ...prev, bot: "" }))
-            // setText(prev => ({ ...prev, bot: "Data question" }))
+            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            //     setText(prev => ({ ...prev, bot: "" }))
+            // }
+            setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
-            const source = await axios.get(`${API_URL}?customScript=${_message}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Chatting" }))
+            // const source = await axios.get(`${API_URL}?customScript=${_message}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Chatting" }))
             // auto focus sau khi bot reply
             setState(prev => ({ ...prev, disabled: false }))
             ref.current.focus()
@@ -200,19 +199,52 @@ const Assistant = () => {
                     }
                 } else if (countReply === 5) {
                     if (index.YN === 0) {//chỗ reply sau option
-                        setCountReply(countReply => countReply + 1)
-                        setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
-                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                        if (state.again === false) {
+                            setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setTimeout(() => {
+                                setState(prev => ({ ...prev, ask: true }))
+                            }, 2000)
+                        }
+                        else if (state.again) {
+                            setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setText(prev => ({ ...prev, bot: "" }))
+                            if (index.options.length < value.optionBot.length) setTimeout(() => {
+                                setState(prev => ({ ...prev, ask: true }))
+                            }, 2000);
+                            else {
+                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                                setState(prev => ({ ...prev, request: true }))
+                            }
+                        }
                     }
                 } else if (countReply === 7) {
                     if (index.YN === 1) {
-                        setCountReply(countReply => countReply + 1)
-                        setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
-                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+
+                        // setCountReply(countReply => countReply + 1)
+                        // setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                        // setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
+                        if (state.again === false) {
+                            setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setTimeout(() => {
+                                setState(prev => ({ ...prev, ask: true }))
+                            }, 2000)
+                        }
+                        else if (state.again) {
+                            setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setText(prev => ({ ...prev, bot: "" }))
+                            if (index.options.length < value.optionBot.length) setTimeout(() => {
+                                setState(prev => ({ ...prev, ask: true }))
+                            }, 2000);
+                            else {
+                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                                setState(prev => ({ ...prev, request: true }))
+                            }
+                        }
+
                     }
                 }
             } else if (index.obj === 1) {
-                if (countReply === 3) {
+                if (countReply === 3 && state.again === false) {
                     setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
                     setTimeout(() => {
                         setState(prev => ({ ...prev, ask: true }))
@@ -228,7 +260,6 @@ const Assistant = () => {
                         setState(prev => ({ ...prev, request: true }))
                     }
                 }
-
             } else if (index.start === 1) {
                 setBoxChat1(prev => ([...prev, { user: "bot", value: messageBot }]))
                 setText(prev => ({ ...prev, bot: "" }))
@@ -243,7 +274,7 @@ const Assistant = () => {
             else if (countReply === 4) setBoxChat4(prev => ([...prev, { user: "exam", value: messBot }]))
             else if (countReply === 5) setBoxChat5(prev => ([...prev, { user: "exam", value: messBot }]))
             else if (countReply === 6) setBoxChat6(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 8) setBoxChat7(prev => ([...prev, { user: "exam", value: messBot }]))
+            else if (countReply === 7) setBoxChat7(prev => ([...prev, { user: "exam", value: messBot }]))
         } else if (index.obj === 1) {
             if (countReply === 1) setBoxChat1(prev => ([...prev, { user: "exam", value: messBot }]))
             else if (countReply === 2) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))// obj2 submit ; obj0 2exam, obj1 2exam 
@@ -293,7 +324,7 @@ const Assistant = () => {
     const handleOption = (e: any, i: number) => {
         setIndex(prev => ({ ...prev, options: [...index.options, i] }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        setCountReply(countReply => countReply + 1);
+        if (state.again === false) setCountReply(countReply => countReply + 1);
     }
     const handleSendEmail = () => {
         axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
@@ -430,8 +461,8 @@ const Assistant = () => {
             id="sendEmail"
             onClick={async (e) => {
                 if (index.obj === 0) {
-                    if (index.YN === 0 && countReply === 6) handleSendEmail()
-                    else if (index.YN === 1 && countReply === 8) handleSendEmail()
+                    if (index.YN === 0 && countReply === 5) handleSendEmail()
+                    else if (index.YN === 1 && countReply === 7) handleSendEmail()
                 } else if (index.obj === 1 && countReply === 3) handleSendEmail()
                 else if (countReply === 1 && index.obj === 2) handleSendEmail()
             }}
@@ -641,11 +672,11 @@ const Assistant = () => {
                         {value.optionBot.length > 0 && index.YN === 0 && OptionComponent}
                         {boxChat5.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat5.length >= 2 && index.YN === 1 && TopicComponent}
+                        {boxChat5.length >= 2 && index.YN === 0 && state.request && RequestEndComponent}
                         {boxChat6.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat6.length >= 2 && index.YN === 1 && OptionComponent}
-                        {/* {boxChat6.length >= 1 && index.YN === 0 && RequestEndComponent} */}
                         {boxChat7.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {/* {boxChat7.length >= 3 && RequestEndComponent} */}
+                        {boxChat7.length >= 3 && state.request && RequestEndComponent}
                         {/* input end in index012 */}
                         {state.showEnd && ShowEndComponent}
                         {boxChatEnd.map((reply, index) => <Reply key={index} id={index} data={reply} />)}

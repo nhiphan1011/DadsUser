@@ -35,30 +35,3 @@ export default function Reply({ data }: props) {
         </div >);
 }
 
-// export function TextBot({ countReply, messageBot }: props) {
-//     return (
-//         <div className="flex space-x-2" id={`${countReply}bot`}>
-//             <img
-//                 src="/static/media/Bot.e33d536bdd412e738363.png" alt="bot"
-//                 className="w-[50px] h-[50px] object-contain" />
-//             <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
-//                 {messageBot}
-//             </div>
-//         </div>
-//     )
-// }
-// export function TextBotExample({ countReply, messBot }: props) {
-//     return (
-//         <div className="flex space-x-2 my-5" id={`${countReply}bot`}>
-//             <img src="/static/media/Bot.e33d536bdd412e738363.png"
-//                 alt="exam"
-//                 className="w-[50px] h-[50px] object-contain" />
-//             <div className="bg-[#F2F4F5] justify-start  p-4  text-primary rounded-r-[16px] rounded-bl-[16px] max-w-[60%]">
-//                 {messBot}
-//             </div>
-//         </div>
-//     )
-// }
-// export default function Reply({ countReply }: props) {
-
-// }
