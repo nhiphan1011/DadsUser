@@ -15,13 +15,13 @@ import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton,
 
 // gom state, ứng dụng spread 
 const Assistant = () => {
-    const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: number, end: number }>({
+    const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: Array<number>, end: number }>({
         start: -1,
         obj: -1,
         YN: -1,
         YN1: -1,
         topic: -1,
-        options: -1,
+        options: [],
         end: -1,
     })
     const [text, setText] = useState<{ user: string, bot: string, exam: string }>({
@@ -35,14 +35,16 @@ const Assistant = () => {
         email: "",
         optionBot: []
     })
-    const [state, setState] = useState<{ index3: boolean, showEnd: boolean, ask: boolean, request: boolean }>({
+    const [state, setState] = useState<{ index3: boolean, showEnd: boolean, loading: boolean, ask: boolean, again: boolean, request: boolean, btnDisable: boolean, disabled: boolean }>({
         index3: false,
         showEnd: false,
-        ask: false,
-        request: false
+        loading: false,
+        ask: false, //modal xuất hiện
+        again: false, //vẫn còn hỏi tiếp
+        request: false,
+        btnDisable: false,
+        disabled: true//input disable
     })
-    const [loading, setLoading] = useState<boolean>(false)
-    const [disabled, setDisabled] = useState<boolean>(true)
     const [countReply, setCountReply] = useState<number>(-1);// sau 1 click count+=1
     const [countYN, setCountYN] = useState<number>(-1)// dùng để đếm caseYN
     const [countTextBotExample, setCountTextBotExample] = useState<number>(0);
@@ -57,8 +59,8 @@ const Assistant = () => {
     const [boxChatEnd, setBoxChatEnd] = useState<Array<any>>([])
 
     const [api, contextHolder] = notification.useNotification();
-    // console.log('index:', index)
-    // console.log('text:', text)
+    console.log('index:', index)
+    console.log('state:', state)
     // console.log('boxChat1:', boxChat1)
     // console.log('boxChat2:', boxChat2)
     // console.log('boxChat3:', boxChat3)
@@ -67,7 +69,7 @@ const Assistant = () => {
     // console.log('boxChat6:', boxChat6)
     // console.log('boxChat7:', boxChat7)
     // console.log('boxChatEnd:', boxChatEnd)
-    // // console.log('textBot:', textBot)
+    console.log('text:', text)
     // console.log('message:', message)
     console.log('countReply', countReply)
     // console.log('countYN:', countYN)
@@ -75,50 +77,51 @@ const Assistant = () => {
     // console.log('value:', value)
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
-        setLoading(true)
+        setState(prev => ({ ...prev, btnDisable: true, loading: true, disabled: true }))
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
-            // const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            // if (source) {
-            //     setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            // }
-            setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
+            const source = await axios.get(`${API_URL}?topic=${_topic}`)
+            if (source) {
+                setValue(prev => ({ ...prev, optionBot: source.data.data }))
+            }
+            // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
         if (question) {
-            // const _question = encodeURIComponent(question)
-            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            // if (source) {
-            //     setText(prev => ({ ...prev, bot: source.data.data }))
-            // }
-            setText(prev => ({ ...prev, bot: "Data question" }))
+            const _question = encodeURIComponent(question)
+            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            if (source) {
+                setText(prev => ({ ...prev, bot: source.data.data }))
+            }
+            setText(prev => ({ ...prev, bot: "" }))
+            // setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
             const source = await axios.get(`${API_URL}?customScript=${_message}`)
             if (source) {
                 setText(prev => ({ ...prev, bot: source.data.data }))
-                // setText(prev => ({ ...prev, bot: "Chatting" }))
             }
-            setDisabled(false)
-            ref.current.focus()// auto focus sau khi bot reply
+            // setText(prev => ({ ...prev, bot: "Chatting" }))
+            // auto focus sau khi bot reply
+            setState(prev => ({ ...prev, disabled: false }))
+            ref.current.focus()
         }
-        setLoading(false)
+        setState(prev => ({ ...prev, btnDisable: false, loading: false }))
     };
 
     const handleChangeSelect = (e: any) => {
         setValue(prev => ({ ...prev, selected: e.target.value }));
     };
-    console.log(state.ask)
     const handleAddText = async (messageUser: string, messageBot: string, countReply: number) => {
         if (messageUser) {
             if (index.obj === 0) {
@@ -172,7 +175,10 @@ const Assistant = () => {
                 } else if (countReply === 3) {
                     setBoxChat3(prev => ([...prev, { user: "user", value: messageUser }]))
                     post("", "", "", messageUser, "")
-                    setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                    // setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))// based on your skill...
+                } else if (state.again) {
+                    setBoxChat3(prev => ([...prev, { user: "user", value: messageUser }]))
+                    post("", "", "", messageUser, "")
                 }
             } else if (index.obj === 2) {
                 if (countReply === 1) {
@@ -208,7 +214,19 @@ const Assistant = () => {
             } else if (index.obj === 1) {
                 if (countReply === 3) {
                     setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
-                    setState(prev => ({ ...prev, ask: true }))
+                    setTimeout(() => {
+                        setState(prev => ({ ...prev, ask: true }))
+                    }, 2000);
+                } else if (state.again) {
+                    setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
+                    setText(prev => ({ ...prev, bot: "" }))
+                    if (index.options.length < value.optionBot.length) setTimeout(() => {
+                        setState(prev => ({ ...prev, ask: true }))
+                    }, 2000);
+                    else {
+                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                        setState(prev => ({ ...prev, request: true }))
+                    }
                 }
 
             } else if (index.start === 1) {
@@ -229,7 +247,7 @@ const Assistant = () => {
         } else if (index.obj === 1) {
             if (countReply === 1) setBoxChat1(prev => ([...prev, { user: "exam", value: messBot }]))
             else if (countReply === 2) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))// obj2 submit ; obj0 2exam, obj1 2exam 
-            else if (countReply === 3) setBoxChat3(prev => ([...prev, { user: "exam", value: messBot }]))
+            else if (countReply >= 3) setBoxChat3(prev => ([...prev, { user: "exam", value: messBot }]))
         }
         else if (index.obj === 2) {
             if (countReply === 1) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))
@@ -254,7 +272,7 @@ const Assistant = () => {
     }
     const handleSend = async () => {
         // lúc select&send xuất hiện lần đầu
-        setLoading(true)
+        setState(prev => ({ ...prev, loading: true }))
         post(text.user, value.selected, "", "", "");
         setCountReply(countReply => countReply + 1)
     }
@@ -273,7 +291,7 @@ const Assistant = () => {
         setCountReply(countReply => countReply + 1)
     }
     const handleOption = (e: any, i: number) => {
-        setIndex(prev => ({ ...prev, options: i }));
+        setIndex(prev => ({ ...prev, options: [...index.options, i] }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
         setCountReply(countReply => countReply + 1);
     }
@@ -365,17 +383,19 @@ const Assistant = () => {
         {value.optionBot.map((item: any, i: any) => {
             return (
                 <button
+                    disabled={state.btnDisable}
                     onClick={(e) => {
                         if (countReply === 4 && index.YN === 0) handleOption(e, i)
                         else if (countReply === 6 && index.YN === 1) handleOption(e, i)
                         else if (countReply === 2 && index.obj === 1) handleOption(e, i)
+                        else if (state.again) handleOption(e, i)
                     }}
                     key={i}
                     className={`fadeIn option w-[full] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
-        bg-[${index.options === i ? "#EBE1FF" : "#F2F4F5"}] 
-        text-[${index.options === i ? "#120360" : "primary"}] 
-        hover:bg-[${index.options < 0 ? "#EBE1FF" : "#F2F4F5"}]
-        hover:text-[${index.options < 0 ? "#120360" : "primary"}]
+        bg-[${index.options.includes(i) ? "#EBE1FF" : "#F2F4F5"}] 
+        text-[${index.options.includes(i) ? "#120360" : "primary"}] 
+        hover:bg-[${!index.options.includes(i) && state.btnDisable === false && state.request === false ? "#EBE1FF" : "#F2F4F5"}]
+        hover:text-[${!index.options.includes(i) && state.btnDisable === false && state.request === false ? "#120360" : "primary"}]
         `}>
                     {item}
                 </button>
@@ -427,18 +447,19 @@ const Assistant = () => {
     };
     const AskAgain = () => {
         const handleOk = () => {
-            setState(prev => ({ ...prev, ask: false }))
-            console.log("ok")
+            setState(prev => ({ ...prev, ask: false, again: true }))
         }
 
         const handleCancel = () => {
-            setState(prev => ({ ...prev, ask: false }))
-            setState(prev => ({ ...prev, request: true }))
+            setState(prev => ({ ...prev, ask: false, again: false, request: true }))
+            setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
         };
 
         return (
 
             <Modal
+                closable={false}
+                centered={true}
                 open={state.ask}
                 title="Notification"
                 onOk={handleOk}
@@ -539,7 +560,7 @@ const Assistant = () => {
                                     onClick={async (e) => {
                                         if (countReply < 0) {
                                             if (i === 1) {
-                                                await setDisabled(false)
+                                                await setState(prev => ({ ...prev, disabled: false }))
                                                 await ref.current.focus()
                                             }
                                             handleStart(i)
@@ -553,6 +574,7 @@ const Assistant = () => {
                                         if (message.length === 0 && index.start === 1) {
                                             setIndex(prev => ({ ...prev, start: i }))
                                             setCountReply(0)
+                                            setState(prev => ({ ...prev, disabled: true }))
                                         }
                                     }}
                                     key={i}
@@ -627,7 +649,8 @@ const Assistant = () => {
                         {/* input end in index012 */}
                         {state.showEnd && ShowEndComponent}
                         {boxChatEnd.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {loading && <Loading />}
+                        {state.loading && <Loading />}
+                        {state.ask && <AskAgain />}
                     </div>
                 </div>
             </div>
@@ -643,7 +666,7 @@ const Assistant = () => {
                 {/* Input Chat */}
                 <div className='w-full flex justify-center rounded-sm py-[10px] '>
                     <input
-                        disabled={disabled}
+                        disabled={state.disabled}
                         ref={ref}
                         className='w-full bg-[#F2F4F5] px-[20px] py-[10px] rounded-[20px]'
                         placeholder='Type something to chat with Alley...'
@@ -657,7 +680,8 @@ const Assistant = () => {
                             e.preventDefault()
                             setCountReply(countReply => countReply + 1)
                             if (countReply >= 0) handleChat()
-                            setDisabled(true)
+                            setState(prev => ({ ...prev, disabled: false }))
+
                         }}
                     >SEND</button>
                 </div>
