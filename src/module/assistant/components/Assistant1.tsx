@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Typewriter from 'typewriter-effect';
-import { notification } from "antd";
+import { Button, Modal, Space, notification } from "antd";
 import type { NotificationPlacement } from 'antd/es/notification/interface';
 import axios from "axios";
 import { SelectInput, TypingDots, Reply } from "components";
@@ -35,9 +35,11 @@ const Assistant = () => {
         email: "",
         optionBot: []
     })
-    const [state, setState] = useState<{ index3: boolean, showEnd: boolean }>({
+    const [state, setState] = useState<{ index3: boolean, showEnd: boolean, ask: boolean, request: boolean }>({
         index3: false,
-        showEnd: false
+        showEnd: false,
+        ask: false,
+        request: false
     })
     const [loading, setLoading] = useState<boolean>(false)
     const [disabled, setDisabled] = useState<boolean>(true)
@@ -77,28 +79,28 @@ const Assistant = () => {
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
-            const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
+            // const source = await axios.get(`${API_URL}?act=${_act}&skill=${_skill}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Call Data lần 1" }))
         }
         if (topic) {
             const _topic = encodeURIComponent(topic)
-            const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            if (source) {
-                setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            }
-            // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
+            // const source = await axios.get(`${API_URL}?topic=${_topic}`)
+            // if (source) {
+            //     setValue(prev => ({ ...prev, optionBot: source.data.data }))
+            // }
+            setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
         if (question) {
-            const _question = encodeURIComponent(question)
-            const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
-            if (source) {
-                setText(prev => ({ ...prev, bot: source.data.data }))
-            }
-            // setText(prev => ({ ...prev, bot: "Data question" }))
+            // const _question = encodeURIComponent(question)
+            // const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
+            // if (source) {
+            //     setText(prev => ({ ...prev, bot: source.data.data }))
+            // }
+            setText(prev => ({ ...prev, bot: "Data question" }))
         }
         if (message) {
             const _message = encodeURIComponent(message)
@@ -116,6 +118,7 @@ const Assistant = () => {
     const handleChangeSelect = (e: any) => {
         setValue(prev => ({ ...prev, selected: e.target.value }));
     };
+    console.log(state.ask)
     const handleAddText = async (messageUser: string, messageBot: string, countReply: number) => {
         if (messageUser) {
             if (index.obj === 0) {
@@ -190,7 +193,7 @@ const Assistant = () => {
                         setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
                     }
                 } else if (countReply === 5) {
-                    if (index.YN === 0) {//chỗ reply sau opntion
+                    if (index.YN === 0) {//chỗ reply sau option
                         setCountReply(countReply => countReply + 1)
                         setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
                         setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
@@ -200,12 +203,12 @@ const Assistant = () => {
                         setCountReply(countReply => countReply + 1)
                         setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
                         setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
-
                     }
                 }
             } else if (index.obj === 1) {
                 if (countReply === 3) {
                     setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
+                    setState(prev => ({ ...prev, ask: true }))
                 }
 
             } else if (index.start === 1) {
@@ -234,7 +237,7 @@ const Assistant = () => {
         setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const ref: any = useRef();
-    const refInput: any = useRef();
+    // const refInput: any = useRef();
     const handleStart = (i: number) => {
         ref.current.focus()
         setIndex(prev => ({ ...prev, start: i }))
@@ -284,6 +287,7 @@ const Assistant = () => {
         await setText((prev => ({ ...prev, user: message })))
         post("", "", "", "", message)
         setMessage("")
+        ref.current.focus()
     }
     const Loading = () => (
         <div className="flex space-x-2 my-[10px]">
@@ -398,7 +402,8 @@ const Assistant = () => {
             value={value.email}
             onChange={(e) => setValue(prev => ({ ...prev, email: e.target.value }))}
             type="email"
-            ref={refInput}
+            id="inputEmail"
+        // ref={refInput}
         />
         <button
             className='min-w-[90px] rounded-[12px] p-4 bg-[#FF008A] text-white hover:cursor-pointer '
@@ -420,6 +425,38 @@ const Assistant = () => {
             placement
         });
     };
+    const AskAgain = () => {
+        const handleOk = () => {
+            setState(prev => ({ ...prev, ask: false }))
+            console.log("ok")
+        }
+
+        const handleCancel = () => {
+            setState(prev => ({ ...prev, ask: false }))
+            setState(prev => ({ ...prev, request: true }))
+        };
+
+        return (
+
+            <Modal
+                open={state.ask}
+                title="Notification"
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Go to end
+                    </Button>,
+                    <Button className="bg-[#1677ff]" key="submit" type="primary" onClick={handleOk}>
+                        OK
+                    </Button>,
+                ]}
+            >
+                <p>Do you want to ask again ?</p>
+            </Modal>
+
+        )
+    }
     useEffect(() => {
         const handleEnter = (event: any) => {
             if (event.key === "Enter") {
@@ -440,9 +477,9 @@ const Assistant = () => {
                 document.getElementById("sendEmail")?.click();
             }
         };
-        refInput.current?.addEventListener('keydown', handleEnterEmail);
+        document.getElementById("inputEmail")?.addEventListener('keydown', handleEnterEmail);
         return () => {
-            refInput.current?.removeEventListener('keydown', handleEnterEmail)
+            document.getElementById("inputEmail")?.removeEventListener('keydown', handleEnterEmail)
         }
     }, [])
     useEffect(() => {
@@ -574,7 +611,9 @@ const Assistant = () => {
                         {boxChat3.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat3.length >= 2 && index.obj === 0 && index.YN === 0 && TopicComponent}
                         {boxChat3.length >= 2 && index.obj === 0 && index.YN === 1 && SelectAndSendComponent}
-                        {boxChat3.length >= 3 && index.obj === 1 && RequestEndComponent}
+                        {/* {boxChat3.length >= 3 && index.obj === 1 && RequestEndComponent} */}
+                        {boxChat3.length >= 3 && index.obj === 1 && state.request && RequestEndComponent}
+                        {boxChat3.length >= 3 && index.obj === 1 && <AskAgain />}
                         {boxChat4.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat4.length >= 2 && index.YN === 1 && <YesNoButtonComponent index={index.YN1} />}
                         {value.optionBot.length > 0 && index.YN === 0 && OptionComponent}
@@ -582,9 +621,9 @@ const Assistant = () => {
                         {boxChat5.length >= 2 && index.YN === 1 && TopicComponent}
                         {boxChat6.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat6.length >= 2 && index.YN === 1 && OptionComponent}
-                        {boxChat6.length >= 1 && index.YN === 0 && RequestEndComponent}
+                        {/* {boxChat6.length >= 1 && index.YN === 0 && RequestEndComponent} */}
                         {boxChat7.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat7.length >= 3 && RequestEndComponent}
+                        {/* {boxChat7.length >= 3 && RequestEndComponent} */}
                         {/* input end in index012 */}
                         {state.showEnd && ShowEndComponent}
                         {boxChatEnd.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
