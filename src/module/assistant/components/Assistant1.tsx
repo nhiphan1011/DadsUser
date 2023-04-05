@@ -286,7 +286,6 @@ const Assistant = () => {
         setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const ref: any = useRef();
-    // const refInput: any = useRef();
     const handleStart = (i: number) => {
         ref.current.focus()
         setIndex(prev => ({ ...prev, start: i }))
@@ -337,6 +336,18 @@ const Assistant = () => {
         post("", "", "", "", message)
         setMessage("")
         ref.current.focus()
+    }
+    const handleChatEnter = (e: any) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("send")?.click();
+        }
+    }
+    const handleSubmitEnter = (e: any) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("sendEmail")?.click();
+        }
     }
     const Loading = () => (
         <div className="flex space-x-2 my-[10px]">
@@ -448,13 +459,13 @@ const Assistant = () => {
     </button>
     const ShowEndComponent = <div className="flex max-w-[500px] mx-auto space-x-5  mb-5 justify-center items-center">
         <input
+            onKeyDown={(e) => handleSubmitEnter(e)}
             className='w-full min-w-[150px] px-[25px]  min-h-[38px] bg-[#EBE1FF] text-xl font-light rounded-[12px] shadow-lg border-none'
             placeholder='Enter your Email here'
             value={value.email}
             onChange={(e) => setValue(prev => ({ ...prev, email: e.target.value }))}
             type="email"
             id="inputEmail"
-        // ref={refInput}
         />
         <button
             className='min-w-[90px] rounded-[12px] p-4 bg-[#FF008A] text-white hover:cursor-pointer '
@@ -509,31 +520,6 @@ const Assistant = () => {
 
         )
     }
-    useEffect(() => {
-        const handleEnter = (event: any) => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                document.getElementById("send")?.click();
-            }
-        };
-        ref.current?.addEventListener('keydown', handleEnter);
-        return () => {
-            ref.current?.removeEventListener('keydown', handleEnter)
-        }
-    }, [])
-    useEffect(() => {
-        const handleEnterEmail = (event: any) => {
-            if (event.key === "Enter") {
-                console.log("EventE", event)
-                event.preventDefault();
-                document.getElementById("sendEmail")?.click();
-            }
-        };
-        document.getElementById("inputEmail")?.addEventListener('keydown', handleEnterEmail);
-        return () => {
-            document.getElementById("inputEmail")?.removeEventListener('keydown', handleEnterEmail)
-        }
-    }, [])
     useEffect(() => {
         if (countReply > 0) handleAddTextBotExample(text.exam);
     }, [text.exam]);
@@ -699,6 +685,7 @@ const Assistant = () => {
                     <input
                         disabled={state.disabled}
                         ref={ref}
+                        onKeyDown={e => handleChatEnter(e)}
                         className='w-full bg-[#F2F4F5] px-[20px] py-[10px] rounded-[20px]'
                         placeholder='Type something to chat with Alley...'
                         value={message}
@@ -712,7 +699,6 @@ const Assistant = () => {
                             setCountReply(countReply => countReply + 1)
                             if (countReply >= 0) handleChat()
                             setState(prev => ({ ...prev, disabled: false }))
-
                         }}
                     >SEND</button>
                 </div>
