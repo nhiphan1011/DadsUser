@@ -50,9 +50,6 @@ const Assistant = () => {
         YN: -1,// dùng để đếm caseYN
         textBotExample: 0
     })
-    // const [countReply, setCountReply] = useState<number>(-1);
-    // const [countYN, setCountYN] = useState<number>(-1)
-    // const [countTextBotExample, setCountTextBotExample] = useState<number>(0);
     const [message, setMessage] = useState<string>("")
     const [boxChat, setBoxChat] = useState<{ boxChat1: Array<any>, boxChat2: Array<any>, boxChat3: Array<any>, boxChat4: Array<any>, boxChat5: Array<any>, boxChat6: Array<any>, boxChat7: Array<any>, boxChatEnd: Array<any>, }>({
         boxChat1: [],
@@ -65,7 +62,7 @@ const Assistant = () => {
         boxChatEnd: [],
     })
     const [api, contextHolder] = notification.useNotification();
-    // console.log("index", index)
+    console.log("index", index)
     console.log("boxChat", boxChat)
     console.log("text", text)
     console.log("count", count)
@@ -577,12 +574,9 @@ const Assistant = () => {
                                             handleStart(i)
                                         }
                                         // bấm bao nhiu lần chat now cũng auto focus
-                                        // if (i === 1 && index.start === 1) {
-                                        //     await setDisabled(false)
-                                        //     await ref.current.focus()
-                                        // }
+                                        if (i === 1 && index.start === 1) await ref.current.focus()
                                         // chọn chat nhưng chưa type thì vẫn chọn script đc
-                                        if (message.length === 0 && index.start === 1) {
+                                        if (message.length === 0 && index.start === 1 && i === 0) {
                                             setIndex(prev => ({ ...prev, start: i }))
                                             setCount(prev => ({ ...prev, reply: 0 }))//setCountReply(0)
                                             setState(prev => ({ ...prev, disabled: true }))
