@@ -45,35 +45,30 @@ const Assistant = () => {
         btnDisable: false,
         disabled: true//input disable
     })
-    const [countReply, setCountReply] = useState<number>(-1);// sau 1 click count+=1
-    const [countYN, setCountYN] = useState<number>(-1)// dùng để đếm caseYN
-    const [countTextBotExample, setCountTextBotExample] = useState<number>(0);
+    const [count, setCount] = useState<{ reply: number, YN: number, textBotExample: number }>({
+        reply: -1,// sau 1 click count+=1
+        YN: -1,// dùng để đếm caseYN
+        textBotExample: 0
+    })
+    // const [countReply, setCountReply] = useState<number>(-1);
+    // const [countYN, setCountYN] = useState<number>(-1)
+    // const [countTextBotExample, setCountTextBotExample] = useState<number>(0);
     const [message, setMessage] = useState<string>("")
-    const [boxChat1, setBoxChat1] = useState<Array<any>>([])
-    const [boxChat2, setBoxChat2] = useState<Array<any>>([])
-    const [boxChat3, setBoxChat3] = useState<Array<any>>([])
-    const [boxChat4, setBoxChat4] = useState<Array<any>>([])
-    const [boxChat5, setBoxChat5] = useState<Array<any>>([])
-    const [boxChat6, setBoxChat6] = useState<Array<any>>([])
-    const [boxChat7, setBoxChat7] = useState<Array<any>>([])
-    const [boxChatEnd, setBoxChatEnd] = useState<Array<any>>([])
+    const [boxChat, setBoxChat] = useState<{ boxChat1: Array<any>, boxChat2: Array<any>, boxChat3: Array<any>, boxChat4: Array<any>, boxChat5: Array<any>, boxChat6: Array<any>, boxChat7: Array<any>, boxChatEnd: Array<any>, }>({
+        boxChat1: [],
+        boxChat2: [],
+        boxChat3: [],
+        boxChat4: [],
+        boxChat5: [],
+        boxChat6: [],
+        boxChat7: [],
+        boxChatEnd: [],
+    })
     const [api, contextHolder] = notification.useNotification();
-    console.log('index:', index)
-    console.log('state:', state)
-    // console.log('boxChat1:', boxChat1)
-    // console.log('boxChat2:', boxChat2)
-    // console.log('boxChat3:', boxChat3)
-    // console.log('boxChat4:', boxChat4)
-    console.log('boxChat5:', boxChat5)
-    console.log('boxChat6:', boxChat6)
-    console.log('boxChat7:', boxChat7)
-    // console.log('boxChatEnd:', boxChatEnd)
-    console.log('text:', text)
-    // console.log('message:', message)
-    console.log('countReply', countReply)
-    // console.log('countYN:', countYN)
-    // console.log('countTextBotExample:', countTextBotExample)
-    // console.log('value:', value)
+    // console.log("index", index)
+    console.log("boxChat", boxChat)
+    console.log("text", text)
+    console.log("count", count)
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
         setState(prev => ({ ...prev, btnDisable: true, loading: true, disabled: true }))
@@ -100,7 +95,7 @@ const Assistant = () => {
             const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
             if (source) {
                 setText(prev => ({ ...prev, bot: source.data.data }))
-                setText(prev => ({ ...prev, bot: "" }))
+                // setText(prev => ({ ...prev, bot: "" }))
             }
             // setText(prev => ({ ...prev, bot: "Data question" }))
         }
@@ -125,118 +120,112 @@ const Assistant = () => {
         if (messageUser) {
             if (index.obj === 0) {
                 if (countReply === 1) {
-                    setBoxChat1(prev => ([...prev, { user: "user", value: messageUser }]))
-                    setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                    setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "user", value: messageUser }] }))
+                    setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                 } else if (countReply === 3) {
-                    setBoxChat3(prev => ([...prev, { user: "user", value: messageUser }]))
+                    setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "user", value: messageUser }] }))
                     if (index.YN === 0) {
-                        setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                        setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                     } else if (index.YN === 1) {
-                        setText(prev => ({ ...prev, exam: TextBotExamYN[countYN] }))
+                        setText(prev => ({ ...prev, exam: TextBotExamYN[count.YN] }))
                     }
                 } else if (countReply === 4) {
                     if (index.YN === 0) {
-                        setBoxChat4(prev => ([...prev, { user: "user", value: messageUser }]))
-                        setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                        setBoxChat(prev => ({ ...prev, boxChat4: [...boxChat.boxChat4, { user: "user", value: messageUser }] }))
+                        setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                         post("", "", messageUser, "", "")
                     }
                 } else if (countReply === 5) {
                     if (index.YN === 0) {
-                        setBoxChat5(prev => ([...prev, { user: "user", value: messageUser }]))
+                        setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "user", value: messageUser }] }))
                         post("", "", "", messageUser, "")
-                    }
-                    else if (index.YN === 1) {
-                        setBoxChat5(prev => ([...prev, { user: "user", value: messageUser }]))
+                    } else if (index.YN === 1) {
+                        setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "user", value: messageUser }] }))
                         if (index.YN1 === 0) {
-                            setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                            setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                         } else if (index.YN1 === 1) {
-                            setText(prev => ({ ...prev, exam: TextBotExamYN[countYN] }))
+                            setText(prev => ({ ...prev, exam: TextBotExamYN[count.YN] }))
                         }
                     }
                 } else if (countReply === 6) {
-                    setBoxChat6(prev => ([...prev, { user: "user", value: messageUser }]))
-                    setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                    setBoxChat(prev => ({ ...prev, boxChat6: [...boxChat.boxChat6, { user: "user", value: messageUser }] }))
+                    setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                     post("", "", messageUser, "", "")
                 } else if (countReply === 7) {
                     if (index.YN === 1) {
-                        setBoxChat7(prev => ([...prev, { user: "user", value: messageUser }]))
+                        setBoxChat(prev => ({ ...prev, boxChat7: [...boxChat.boxChat7, { user: "user", value: messageUser }] }))
                         post("", "", "", messageUser, "")
                     }
                 }
             } else if (index.obj === 1) {
                 if (countReply === 1) {
-                    setBoxChat1(prev => ([...prev, { user: "user", value: messageUser }]))
-                    setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                    setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "user", value: messageUser }] }))
+                    setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                 } else if (countReply === 2) {
-                    setBoxChat2(prev => ([...prev, { user: "user", value: messageUser }]))
-                    setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))
+                    setBoxChat(prev => ({ ...prev, boxChat2: [...boxChat.boxChat2, { user: "user", value: messageUser }] }))
+                    setText(prev => ({ ...prev, exam: TextBotExample[count.textBotExample] }))
                     post("", "", messageUser, "", "")
                 } else if (countReply === 3) {
-                    setBoxChat3(prev => ([...prev, { user: "user", value: messageUser }]))
+                    setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "user", value: messageUser }] }))
                     post("", "", "", messageUser, "")
-                    // setText(prev => ({ ...prev, exam: TextBotExample[countTextBotExample] }))// based on your skill...
                 } else if (state.again) {
-                    setBoxChat3(prev => ([...prev, { user: "user", value: messageUser }]))
+                    setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "user", value: messageUser }] }))
                     post("", "", "", messageUser, "")
                 }
             } else if (index.obj === 2) {
                 if (countReply === 1) {
-                    setBoxChat1(prev => ([...prev, { user: "user", value: messageUser }]))
+                    setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "user", value: messageUser }] }))
                     setState(prev => ({ ...prev, index3: true }))
                 }
-            } else if (index.start === 1) setBoxChat1(prev => ([...prev, { user: "user", value: messageUser }]))
+            } else if (index.start === 1) setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "user", value: messageUser }] }))
         }
         if (messageBot) {
             if (index.obj === 0) {
                 if (countReply === 2) {
-                    setBoxChat2(prev => ([...prev, { user: "bot", value: messageBot }]))
-                    setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                    setBoxChat(prev => ({ ...prev, boxChat2: [...boxChat.boxChat2, { user: "bot", value: messageBot }] }))
+                    setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
                 } else if (countReply === 4) {
                     if (index.YN === 0) {
                     } else if (index.YN === 1) {
-                        setBoxChat4(prev => ([...prev, { user: "bot", value: messageBot }]))
-                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                        setBoxChat(prev => ({ ...prev, boxChat4: [...boxChat.boxChat4, { user: "bot", value: messageBot }] }))
+                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
                     }
                 } else if (countReply === 5) {
                     if (index.YN === 0) {//chỗ reply sau option
                         if (state.again === false) {
-                            setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "bot", value: messageBot }] }))
                             setTimeout(() => {
                                 setState(prev => ({ ...prev, ask: true }))
                             }, 2000)
                         }
                         else if (state.again) {
-                            setBoxChat5(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "bot", value: messageBot }] }))
                             setText(prev => ({ ...prev, bot: "" }))
                             if (index.options.length < value.optionBot.length) setTimeout(() => {
                                 setState(prev => ({ ...prev, ask: true }))
                             }, 2000);
                             else {
-                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
                                 setState(prev => ({ ...prev, request: true }))
                             }
                         }
                     }
                 } else if (countReply === 7) {
                     if (index.YN === 1) {
-
-                        // setCountReply(countReply => countReply + 1)
-                        // setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
-                        // setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
                         if (state.again === false) {
-                            setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setBoxChat(prev => ({ ...prev, boxChat7: [...boxChat.boxChat7, { user: "bot", value: messageBot }] }))
                             setTimeout(() => {
                                 setState(prev => ({ ...prev, ask: true }))
                             }, 2000)
                         }
                         else if (state.again) {
-                            setBoxChat7(prev => ([...prev, { user: "bot", value: messageBot }]))
+                            setBoxChat(prev => ({ ...prev, boxChat7: [...boxChat.boxChat7, { user: "bot", value: messageBot }] }))
                             setText(prev => ({ ...prev, bot: "" }))
                             if (index.options.length < value.optionBot.length) setTimeout(() => {
                                 setState(prev => ({ ...prev, ask: true }))
                             }, 2000);
                             else {
-                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                                setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
                                 setState(prev => ({ ...prev, request: true }))
                             }
                         }
@@ -245,90 +234,95 @@ const Assistant = () => {
                 }
             } else if (index.obj === 1) {
                 if (countReply === 3 && state.again === false) {
-                    setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
+                    setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "bot", value: messageBot }] }))
                     setTimeout(() => {
                         setState(prev => ({ ...prev, ask: true }))
                     }, 2000);
                 } else if (state.again) {
-                    setBoxChat3(prev => ([...prev, { user: "bot", value: messageBot }]))
+                    setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "bot", value: messageBot }] }))
                     setText(prev => ({ ...prev, bot: "" }))
                     if (index.options.length < value.optionBot.length) setTimeout(() => {
                         setState(prev => ({ ...prev, ask: true }))
                     }, 2000);
                     else {
-                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+                        setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
                         setState(prev => ({ ...prev, request: true }))
                     }
                 }
             } else if (index.start === 1) {
-                setBoxChat1(prev => ([...prev, { user: "bot", value: messageBot }]))
+                setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "bot", value: messageBot }] }))
                 setText(prev => ({ ...prev, bot: "" }))
             }
         }
     };
     const handleAddTextBotExample = (messBot: string) => {
         if (index.obj === 0) {
-            if (countReply === 1) setBoxChat1(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 2) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 3) setBoxChat3(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 4) setBoxChat4(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 5) setBoxChat5(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 6) setBoxChat6(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 7) setBoxChat7(prev => ([...prev, { user: "exam", value: messBot }]))
+            if (count.reply === 1) setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "exam", value: messBot }] }))
+            else if (count.reply === 2) setBoxChat(prev => ({ ...prev, boxChat2: [...boxChat.boxChat2, { user: "exam", value: messBot }] }))
+            else if (count.reply === 3) setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "exam", value: messBot }] }))
+            else if (count.reply === 4) setBoxChat(prev => ({ ...prev, boxChat4: [...boxChat.boxChat4, { user: "exam", value: messBot }] }))
+            else if (count.reply === 5) setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "exam", value: messBot }] }))
+            else if (count.reply === 6) setBoxChat(prev => ({ ...prev, boxChat6: [...boxChat.boxChat6, { user: "exam", value: messBot }] }))
+            else if (count.reply === 7) setBoxChat(prev => ({ ...prev, boxChat7: [...boxChat.boxChat7, { user: "exam", value: messBot }] }))
         } else if (index.obj === 1) {
-            if (countReply === 1) setBoxChat1(prev => ([...prev, { user: "exam", value: messBot }]))
-            else if (countReply === 2) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))// obj2 submit ; obj0 2exam, obj1 2exam 
-            else if (countReply >= 3) setBoxChat3(prev => ([...prev, { user: "exam", value: messBot }]))
+            if (count.reply === 1) setBoxChat(prev => ({ ...prev, boxChat1: [...boxChat.boxChat1, { user: "exam", value: messBot }] }))
+            else if (count.reply === 2) setBoxChat(prev => ({ ...prev, boxChat2: [...boxChat.boxChat2, { user: "exam", value: messBot }] }))// obj2 submit ; obj0 2exam, obj1 2exam 
+            else if (count.reply >= 3) setBoxChat(prev => ({ ...prev, boxChat3: [...boxChat.boxChat3, { user: "exam", value: messBot }] }))
         }
         else if (index.obj === 2) {
-            if (countReply === 1) setBoxChat2(prev => ([...prev, { user: "exam", value: messBot }]))
+            if (count.reply === 1) setBoxChat(prev => ({ ...prev, boxChat2: [...boxChat.boxChat2, { user: "exam", value: messBot }] }))
         }
-        setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
+        setCount(prev => ({ ...prev, textBotExample: count.textBotExample + 1 }))
+        // setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const ref: any = useRef();
     const handleStart = (i: number) => {
         ref.current.focus()
         setIndex(prev => ({ ...prev, start: i }))
-        setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))
+        // setCountReply(countReply => countReply + 1)
     }
     const handleObjective = (e: any, i: number) => {
         // lúc mới start vào
-        if (countReply < 1) {
+        if (count.reply < 1) {
             setIndex(prev => ({ ...prev, obj: i }));
             setText(prev => ({ ...prev, user: e.target.textContent }))
-            setCountReply(countReply => countReply + 1)
-            if (i === 1) setCountTextBotExample(countTextBotExample => countTextBotExample + 2)
+            setCount(prev => ({ ...prev, reply: count.reply + 1 }))
+            // setCountReply(countReply => countReply + 1)
+            if (i === 1) setCount(prev => ({ ...prev, textBotExample: count.textBotExample + 1 }))
+            // setCountTextBotExample(countTextBotExample => countTextBotExample + 2)
         }
     }
     const handleSend = async () => {
         // lúc select&send xuất hiện lần đầu
         setState(prev => ({ ...prev, loading: true }))
         post(text.user, value.selected, "", "", "");
-        setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))
+        // setCountReply(countReply => countReply + 1)
     }
     const handleYesNoButton = async (e: any, i: number) => {
         // Chọn yes hay no cũng dc
-        if (countYN < 0) setIndex(prev => ({ ...prev, YN: i })); //giữ index cho Yes/no lần 1
-        else if (countYN === 0) setIndex(prev => ({ ...prev, YN1: i }));//giữ index cho Yes/no lần 2
+        if (count.YN < 0) setIndex(prev => ({ ...prev, YN: i })); //giữ index cho Yes/no lần 1
+        else if (count.YN === 0) setIndex(prev => ({ ...prev, YN1: i }));//giữ index cho Yes/no lần 2
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))// setCountReply(countReply => countReply + 1)
         // Yes/No lần đầu, Khi chọn NO, chỉ tăng countYN khi chọn NO
-        if (i === 1) setCountYN(countYN => countYN + 1)
+        if (i === 1) setCount(prev => ({ ...prev, YN: count.YN + 1 })) //setCountYN(countYN => countYN + 1)
     }
     const handleTopic = (e: any, i: number) => {
         setIndex(prev => ({ ...prev, topic: i }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))//setCountReply(countReply => countReply + 1)
     }
     const handleOption = (e: any, i: number) => {
         setIndex(prev => ({ ...prev, options: [...index.options, i] }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        if (state.again === false) setCountReply(countReply => countReply + 1);
+        if (state.again === false) setCount(prev => ({ ...prev, reply: count.reply + 1 }))//setCountReply(countReply => countReply + 1);
     }
     const handleSendEmail = () => {
         axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
             email: value.email
-        }).then(() => setBoxChatEnd(prev => ([...prev, { user: "exam", value: "Submit successfully, kindly wait few days, my team will contact you via email" }]))
+        }).then(() => setBoxChat(prev => ({ ...prev, boxChatEnd: [...boxChat.boxChatEnd, { user: "exam", value: "Submit successfully, kindly wait few days, my team will contact you via email" }] }))
         ).catch(() => openNotification("top"))
     }
     const handleChat = async () => {
@@ -368,10 +362,10 @@ const Assistant = () => {
             <div
                 className="flex space-x-6  items-center bg-blue-500 hover:bg-blue-600 transition hover:text-white hover:cursor-pointer hover:scale-105  py-2 px-6 rounded-[16px]"
                 onClick={(e) => {
-                    if (countReply === 1) handleSend()// chỉ cần countReply = 1 trong case obj = 0 vì các case khác ko có SendButton
-                    else if (countReply === 3 && index.YN === 1 && countYN === 0) {
+                    if (count.reply === 1) handleSend()// chỉ cần .r= 1 trong case obj = 0 vì các case khác ko có SendButton
+                    else if (count.reply === 3 && index.YN === 1 && count.YN === 0) {
                         handleSend()
-                        setCountTextBotExample(1)
+                        setCount(prev => ({ ...prev, setCountTextBotExample: 1 }))//setCountTextBotExample(1)
                     }
                 }}
             >
@@ -384,8 +378,8 @@ const Assistant = () => {
                 return (
                     <div
                         onClick={(e) => {
-                            if (countReply === 2) handleYesNoButton(e, i) // chọn Yes/No lần 1
-                            if (countReply === 4) handleYesNoButton(e, i) // chọn Yes/No lần 1
+                            if (count.reply === 2) handleYesNoButton(e, i) // chọn Yes/No lần 1
+                            if (count.reply === 4) handleYesNoButton(e, i) // chọn Yes/No lần 1
                         }}
                         key={i}
                         className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
@@ -401,17 +395,17 @@ const Assistant = () => {
             })}
         </div>
     )
-    const TopicComponent = <div className=" space-x-5 grid-cols-5 flex-wrap grid gap-4 grid-rows-2">
+    const TopicComponent = <div className=" space-x-5 flex flex-wrap justify-center">
         {Topic.map((item, i) => {
             return (
                 <div
                     onClick={(e) => {
-                        if (countReply === 3 && index.obj === 0 && index.YN === 0) handleTopic(e, i)
-                        else if (countReply === 1 && index.obj === 1) handleTopic(e, i)
-                        else if (countReply === 5 && index.YN === 1) handleTopic(e, i)
+                        if (count.reply === 3 && index.obj === 0 && index.YN === 0) handleTopic(e, i)
+                        else if (count.reply === 1 && index.obj === 1) handleTopic(e, i)
+                        else if (count.reply === 5 && index.YN === 1) handleTopic(e, i)
                     }}
                     key={i}
-                    className={`fadeIn flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer w-full
+                    className={`w-fit max-w-[23%] md:max-w-[30%] md:min-w-[18%] fadeIn flex justify-center items-center text-center rounded-[12px] my-2 p-6 hover:cursor-pointer break-words
                         bg-[${index.topic === i ? "#EBE1FF" : "#F2F4F5"}] 
                         text-[${index.topic === i ? "#120360" : "primary"}] 
                         hover:bg-[${index.topic < 0 ? "#EBE1FF" : "#F2F4F5"}]
@@ -421,19 +415,19 @@ const Assistant = () => {
             );
         })}
     </div>
-    const OptionComponent = <div className={`mx-auto grid grid-cols-4 gap-6 grid-rows-${value.optionBot.length / 4} `}>
+    const OptionComponent = <div className={`space-x-5 flex flex-wrap justify-center `}>
         {value.optionBot.map((item: any, i: any) => {
             return (
                 <button
                     disabled={state.btnDisable}
                     onClick={(e) => {
-                        if (countReply === 4 && index.YN === 0) handleOption(e, i)
-                        else if (countReply === 6 && index.YN === 1) handleOption(e, i)
-                        else if (countReply === 2 && index.obj === 1) handleOption(e, i)
+                        if (count.reply === 4 && index.YN === 0) handleOption(e, i)
+                        else if (count.reply === 6 && index.YN === 1) handleOption(e, i)
+                        else if (count.reply === 2 && index.obj === 1) handleOption(e, i)
                         else if (state.again) handleOption(e, i)
                     }}
                     key={i}
-                    className={`fadeIn option w-[full] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                    className={`fadeIn w-fit max-w-[20%] min-w-[20%] option flex justify-center items-center text-center rounded-[12px] my-2 p-6 first-letter:p-6 hover:cursor-pointer break-words
         bg-[${index.options.includes(i) ? "#EBE1FF" : "#F2F4F5"}] 
         text-[${index.options.includes(i) ? "#120360" : "primary"}] 
         hover:bg-[${!index.options.includes(i) && state.btnDisable === false && state.request === false ? "#EBE1FF" : "#F2F4F5"}]
@@ -472,10 +466,10 @@ const Assistant = () => {
             id="sendEmail"
             onClick={async (e) => {
                 if (index.obj === 0) {
-                    if (index.YN === 0 && countReply === 5) handleSendEmail()
-                    else if (index.YN === 1 && countReply === 7) handleSendEmail()
-                } else if (index.obj === 1 && countReply === 3) handleSendEmail()
-                else if (countReply === 1 && index.obj === 2) handleSendEmail()
+                    if (index.YN === 0 && count.reply === 5) handleSendEmail()
+                    else if (index.YN === 1 && count.reply === 7) handleSendEmail()
+                } else if (index.obj === 1 && count.reply === 3) handleSendEmail()
+                else if (count.reply === 1 && index.obj === 2) handleSendEmail()
             }}
         >Submit</button>
     </div >
@@ -494,7 +488,7 @@ const Assistant = () => {
 
         const handleCancel = () => {
             setState(prev => ({ ...prev, ask: false, again: false, request: true }))
-            setText(prev => ({ ...prev, bot: "", exam: TextBotExample[countTextBotExample] }))
+            setText(prev => ({ ...prev, bot: "", exam: TextBotExample[count.textBotExample] }))
         };
 
         return (
@@ -521,10 +515,10 @@ const Assistant = () => {
         )
     }
     useEffect(() => {
-        if (countReply > 0) handleAddTextBotExample(text.exam);
+        if (count.reply > 0) handleAddTextBotExample(text.exam);
     }, [text.exam]);
     useEffect(() => {
-        handleAddText(text.user, text.bot, countReply);
+        handleAddText(text.user, text.bot, count.reply);
     }, [text.user, text.bot]);
     // auto scroll end
     useEffect(() => {
@@ -575,7 +569,7 @@ const Assistant = () => {
                             return (
                                 <button
                                     onClick={async (e) => {
-                                        if (countReply < 0) {
+                                        if (count.reply < 0) {
                                             if (i === 1) {
                                                 await setState(prev => ({ ...prev, disabled: false }))
                                                 await ref.current.focus()
@@ -590,12 +584,13 @@ const Assistant = () => {
                                         // chọn chat nhưng chưa type thì vẫn chọn script đc
                                         if (message.length === 0 && index.start === 1) {
                                             setIndex(prev => ({ ...prev, start: i }))
-                                            setCountReply(0)
+                                            setCount(prev => ({ ...prev, reply: 0 }))//setCountReply(0)
                                             setState(prev => ({ ...prev, disabled: true }))
                                         }
                                     }}
                                     key={i}
-                                    className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer bg-[${index.start === i ? "#EBE1FF" : "#F2F4F5"}] text-[${index.start === i ? "#120360" : "primary"}] hover:bg-[${(countReply < 1 && index.start !== 0) ? "#EBE1FF" : "#F2F4F5"}] hover:text-[${(countReply < 1 && index.start !== 0) ? "#120360" : "primary"}]`}
+                                    className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer 
+                                    bg-[${index.start === i ? "#EBE1FF" : "#F2F4F5"}] text-[${index.start === i ? "#120360" : "primary"}] hover:bg-[${(count.reply < 1 && index.start !== 0) ? "#EBE1FF" : "#F2F4F5"}] hover:text-[${(count.reply < 1 && index.start !== 0) ? "#120360" : "primary"}]`}
                                 >
                                     {item}
                                 </button>
@@ -630,8 +625,8 @@ const Assistant = () => {
                                 </div>
                             </>
                         )}
-                        {boxChat1.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat1.length >= 2 && index.obj === 0 && SelectAndSendComponent}
+                        {boxChat.boxChat1.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat1.length >= 2 && index.obj === 0 && SelectAndSendComponent}
                         {state.index3 && (
                             <>
                                 <div className="flex space-x-2">
@@ -643,29 +638,29 @@ const Assistant = () => {
                                 {ShowEndComponent}
                             </>
                         )}
-                        {boxChat1.length >= 2 && index.obj === 1 && TopicComponent}
-                        {boxChat2.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {index.obj === 0 && boxChat2.length >= 2 && <YesNoButtonComponent index={index.YN} />}
+                        {boxChat.boxChat1.length >= 2 && index.obj === 1 && TopicComponent}
+                        {boxChat.boxChat2.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {index.obj === 0 && boxChat.boxChat2.length >= 2 && <YesNoButtonComponent index={index.YN} />}
                         {value.optionBot.length > 0 && index.obj === 1 && OptionComponent}
-                        {boxChat3.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat3.length >= 2 && index.obj === 0 && index.YN === 0 && TopicComponent}
-                        {boxChat3.length >= 2 && index.obj === 0 && index.YN === 1 && SelectAndSendComponent}
+                        {boxChat.boxChat3.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat3.length >= 2 && index.obj === 0 && index.YN === 0 && TopicComponent}
+                        {boxChat.boxChat3.length >= 2 && index.obj === 0 && index.YN === 1 && SelectAndSendComponent}
                         {/* {boxChat3.length >= 3 && index.obj === 1 && RequestEndComponent} */}
-                        {boxChat3.length >= 3 && index.obj === 1 && state.request && RequestEndComponent}
-                        {boxChat3.length >= 3 && index.obj === 1 && <AskAgain />}
-                        {boxChat4.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat4.length >= 2 && index.YN === 1 && <YesNoButtonComponent index={index.YN1} />}
+                        {boxChat.boxChat3.length >= 3 && index.obj === 1 && state.request && RequestEndComponent}
+                        {boxChat.boxChat3.length >= 3 && index.obj === 1 && <AskAgain />}
+                        {boxChat.boxChat4.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat4.length >= 2 && index.YN === 1 && <YesNoButtonComponent index={index.YN1} />}
                         {value.optionBot.length > 0 && index.YN === 0 && OptionComponent}
-                        {boxChat5.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat5.length >= 2 && index.YN === 1 && TopicComponent}
-                        {boxChat5.length >= 2 && index.YN === 0 && state.request && RequestEndComponent}
-                        {boxChat6.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat6.length >= 2 && index.YN === 1 && OptionComponent}
-                        {boxChat7.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
-                        {boxChat7.length >= 3 && state.request && RequestEndComponent}
+                        {boxChat.boxChat5.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat5.length >= 2 && index.YN === 1 && TopicComponent}
+                        {boxChat.boxChat5.length >= 2 && index.YN === 0 && state.request && RequestEndComponent}
+                        {boxChat.boxChat6.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat6.length >= 2 && index.YN === 1 && OptionComponent}
+                        {boxChat.boxChat7.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChat7.length >= 3 && state.request && RequestEndComponent}
                         {/* input end in index012 */}
                         {state.showEnd && ShowEndComponent}
-                        {boxChatEnd.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
+                        {boxChat.boxChatEnd.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {state.loading && <Loading />}
                         {state.ask && <AskAgain />}
                     </div>
@@ -696,8 +691,8 @@ const Assistant = () => {
                         className='h-[38px] text-2xl p-3 text-[blue] rounded-[20px] hover:bg-[blue] hover:text-white'
                         onClick={(e) => {
                             e.preventDefault()
-                            setCountReply(countReply => countReply + 1)
-                            if (countReply >= 0) handleChat()
+                            setCount(prev => ({ ...prev, reply: count.reply + 1 })) //setCountReply(countReply => countReply + 1)
+                            if (count.reply >= 0) handleChat()
                             setState(prev => ({ ...prev, disabled: false }))
                         }}
                     >SEND</button>

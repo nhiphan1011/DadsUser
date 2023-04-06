@@ -27,7 +27,8 @@ export default function Reply({ data }: props) {
                     <img alt={`${user}`}
                         className="w-[50px] h-[50px] object-contain"
                         src={Bot} />
-                    <div className="max-w-[550px] h-[100%] p-4 rounded-tr-[16px] rounded-l-[16px] my-5 text-primary bg-[#F2F4F5] break-all">
+                    <div style={{ wordBreak: "break-word" }}
+                        className="max-w-[8] h-[100%] p-4 rounded-tr-[16px] rounded-l-[16px] my-5 text-primary bg-[#F2F4F5] break-words">
                         <p dangerouslySetInnerHTML={{ __html: value }}></p>
                     </div>
                 </>

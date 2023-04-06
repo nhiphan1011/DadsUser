@@ -1,9 +1,12 @@
 import React from "react";
 
 import { BeakerIcon } from "@heroicons/react/24/solid";
+import { useLocation } from "react-router-dom";
 const Footer = () => {
+  const location = useLocation();
   return (
-    <footer className="p-4 bg-primary sm:p-6  ">
+    <footer className={`${location.pathname === "/assistants" ? "hidden md:block" : "block"}  p-4 bg-primary sm:p-6`}>
+      {/* <footer className="p-4 bg-primary sm:p-6  "> */}
       <div className="md:flex px-8 ">
         <div className="mb-6 md:mb-0 md:w-1/5">
           <a href="/" className="flex items-center">
