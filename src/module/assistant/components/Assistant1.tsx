@@ -536,13 +536,13 @@ const Assistant = () => {
             <div id="boxwrap"
                 className='w-full md:h-[calc(100vh-67.5px-62px)] flex flex-col md:flex-row overflow-y-scroll'>
                 {/* Avatar Bot */}
-                <div className="w-full md:w-[40%] py-6 px-8">
+                <div className="w-full md:w-[40%] pt-6 px-8">
                     <p className="font-bold">Alley</p>
                     <p>AI Assistant</p>
                     <div className="flex flex-row">
                         <div className="w-[35%]"><img src={Bot} alt="bot" /></div>
                         <div className="w-[75%]">
-                            <div className="bg-[#F2F4F5] p-4 mb-[20px] text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
+                            <div className="bg-[#F2F4F5] p-4  text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
                                 <Typewriter
                                     options={{
                                         delay: 50
