@@ -11,6 +11,9 @@ import { API_URL } from "../constants";
 import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonStart, TextBotExamYN } from 'constant';
 
 const Assistant = () => {
+    const box = document.getElementById("box")
+    const mbox = document.getElementById("box-m")
+    const footerHeight = document.getElementsByClassName("boxchat-footer")[0]?.clientHeight
     const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: Array<number>, end: number }>({
         start: -1,
         obj: -1,
@@ -59,8 +62,21 @@ const Assistant = () => {
         boxChat7: [],
         boxChatEnd: [],
     })
-    console.log(state)
     const [api, contextHolder] = notification.useNotification();
+    const ref: any = useRef();
+    useEffect(() => {
+        if (count.reply > 0) handleAddTextBotExample(text.exam);
+    }, [text.exam]);
+    useEffect(() => {
+        handleAddText(text.user, text.bot, count.reply);
+    }, [text.user, text.bot]);
+    // auto scroll end
+    useEffect(() => {
+        if (box) box.scrollTop = box.scrollHeight
+    }, [box?.scrollHeight, boxChat])
+    useEffect(() => {
+        if (mbox) mbox.scrollTop = mbox.scrollHeight
+    }, [mbox?.scrollHeight, boxChat])
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
         setState(prev => ({ ...prev, btnDisable: true, loading: true, disabled: true }))
@@ -76,10 +92,7 @@ const Assistant = () => {
         if (topic) {
             const _topic = encodeURIComponent(topic)
             const source = await axios.get(`${API_URL}?topic=${_topic}`)
-            if (source) {
-                await setValue(prev => ({ ...prev, optionBot: source.data.data }))
-            }
-            if (document.getElementById("boxwrap")?.scrollHeight) setValue(prev => ({ ...prev, heightOptions: document.getElementById("boxwrap")?.scrollHeight }))
+            if (source) await setValue(prev => ({ ...prev, optionBot: source.data.data }))
             // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
@@ -105,10 +118,7 @@ const Assistant = () => {
         }
         setState(prev => ({ ...prev, btnDisable: false, loading: false }))
     };
-
-    const handleChangeSelect = (e: any) => {
-        setValue(prev => ({ ...prev, selected: e.target.value }));
-    };
+    const handleChangeSelect = (e: any) => setValue(prev => ({ ...prev, selected: e.target.value }));
     const handleAddText = async (messageUser: string, messageBot: string, countReply: number) => {
         if (messageUser) {
             if (index.obj === 0) {
@@ -269,12 +279,10 @@ const Assistant = () => {
         setCount(prev => ({ ...prev, textBotExample: count.textBotExample + 1 }))
         // setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
-    const ref: any = useRef();
     const handleStart = (i: number) => {
-        ref.current.focus()
+        ref.current?.focus()
         setIndex(prev => ({ ...prev, start: i }))
         setCount(prev => ({ ...prev, reply: count.reply + 1 }))
-        // setCountReply(countReply => countReply + 1)
     }
     const handleObjective = (e: any, i: number) => {
         // lúc mới start vào
@@ -282,9 +290,7 @@ const Assistant = () => {
             setIndex(prev => ({ ...prev, obj: i }));
             setText(prev => ({ ...prev, user: e.target.textContent }))
             setCount(prev => ({ ...prev, reply: count.reply + 1 }))
-            // setCountReply(countReply => countReply + 1)
             if (i === 1) setCount(prev => ({ ...prev, textBotExample: count.textBotExample + 1 }))
-            // setCountTextBotExample(countTextBotExample => countTextBotExample + 2)
         }
     }
     const handleSend = async () => {
@@ -292,26 +298,25 @@ const Assistant = () => {
         setState(prev => ({ ...prev, loading: true }))
         post(text.user, value.selected, "", "", "");
         setCount(prev => ({ ...prev, reply: count.reply + 1 }))
-        // setCountReply(countReply => countReply + 1)
     }
     const handleYesNoButton = async (e: any, i: number) => {
         // Chọn yes hay no cũng dc
         if (count.YN < 0) setIndex(prev => ({ ...prev, YN: i })); //giữ index cho Yes/no lần 1
         else if (count.YN === 0) setIndex(prev => ({ ...prev, YN1: i }));//giữ index cho Yes/no lần 2
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        setCount(prev => ({ ...prev, reply: count.reply + 1 }))// setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))
         // Yes/No lần đầu, Khi chọn NO, chỉ tăng countYN khi chọn NO
-        if (i === 1) setCount(prev => ({ ...prev, YN: count.YN + 1 })) //setCountYN(countYN => countYN + 1)
+        if (i === 1) setCount(prev => ({ ...prev, YN: count.YN + 1 }))
     }
     const handleTopic = (e: any, i: number) => {
         setIndex(prev => ({ ...prev, topic: i }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        setCount(prev => ({ ...prev, reply: count.reply + 1 }))//setCountReply(countReply => countReply + 1)
+        setCount(prev => ({ ...prev, reply: count.reply + 1 }))
     }
     const handleOption = (e: any, i: number) => {
         setIndex(prev => ({ ...prev, options: [...index.options, i] }));
         setText(prev => ({ ...prev, user: e.target.textContent }));
-        if (state.again === false) setCount(prev => ({ ...prev, reply: count.reply + 1 }))//setCountReply(countReply => countReply + 1);
+        if (state.again === false) setCount(prev => ({ ...prev, reply: count.reply + 1 }));
     }
     const handleSendEmail = () => {
         axios.post('https://cms.dadsnetwork.co/api/extensions/emailContact', {
@@ -359,7 +364,7 @@ const Assistant = () => {
                     if (count.reply === 1) handleSend()// chỉ cần .r= 1 trong case obj = 0 vì các case khác ko có SendButton
                     else if (count.reply === 3 && index.YN === 1 && count.YN === 0) {
                         handleSend()
-                        setCount(prev => ({ ...prev, setCountTextBotExample: 1 }))//setCountTextBotExample(1)
+                        setCount(prev => ({ ...prev, setCountTextBotExample: 1 }))
                     }
                 }}
             >
@@ -409,7 +414,7 @@ const Assistant = () => {
             );
         })}
     </div>
-    const OptionComponent = <div id="op" tabIndex={0} className={`space-x-5 flex flex-wrap justify-center `}>
+    const OptionComponent = <div id="options" tabIndex={0} className={`space-x-5 flex flex-wrap justify-center `}>
         {value.optionBot.map((item: any, i: any) => {
             return (
                 <button
@@ -448,6 +453,7 @@ const Assistant = () => {
     </button>
     const ShowEndComponent = <div className="flex max-w-[500px] mx-auto space-x-5  mb-5 justify-center items-center">
         <input
+            autoFocus
             onKeyDown={(e) => handleSubmitEnter(e)}
             className='w-full min-w-[150px] px-[25px]  min-h-[38px] bg-[#EBE1FF] text-xl font-light rounded-[12px] shadow-lg border-none'
             placeholder='Enter your Email here'
@@ -476,11 +482,10 @@ const Assistant = () => {
             placement
         });
     };
-    console.log("value", value.heightOptions)
     const AskAgain = () => {
         const handleOk = async () => {
             setState(prev => ({ ...prev, ask: false, again: true }))
-            document.getElementById("op")?.focus()
+            document.getElementById("options")?.focus()
         }
 
         const handleCancel = () => {
@@ -511,21 +516,10 @@ const Assistant = () => {
 
         )
     }
-    useEffect(() => {
-        if (count.reply > 0) handleAddTextBotExample(text.exam);
-    }, [text.exam]);
-    useEffect(() => {
-        handleAddText(text.user, text.bot, count.reply);
-    }, [text.user, text.bot]);
-    // auto scroll end
-    useEffect(() => {
-        const box = document.getElementById("boxwrap")
-        if (box) box.scrollTop = box.scrollHeight
-    }, [document.getElementById("boxwrap")?.scrollHeight, boxChat])
     return (
-        <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col justify-between ">
+        <div className="w-full h-[calc(100vh-67.5px-74.5px)] md:h-[calc(100vh-62px)] flex flex-col justify-between ">
             {contextHolder}
-            <div className='md:h-[calc(100vh-108px-62px)] flex flex-col md:flex-row  '>
+            <div id="box-m" className={`h-[calc(100vh-67.5px-${footerHeight})] md:h-[calc(100vh-108px-62px)] overflow-y-scroll md:overflow-hidden flex flex-col md:flex-row`}>
                 {/* Avatar Bot */}
                 <div className="w-full md:w-[40%] pt-6 px-8">
                     <p className="font-bold">Alley</p>
@@ -536,7 +530,7 @@ const Assistant = () => {
                             <div className="bg-[#F2F4F5] p-4  text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
                                 <Typewriter
                                     options={{
-                                        delay: 1
+                                        delay: 30
                                     }}
                                     onInit={(typewriter) => {
                                         typewriter.typeString(TextBotExam).callFunction(() => setState(prev => ({ ...prev, start: true }))).start()
@@ -548,7 +542,7 @@ const Assistant = () => {
                     </div>
                 </div>
                 {/* Box Chat`` */}
-                {state.start && <div id="boxwrap" className='w-full md:w-[60%] p-8 transition overflow-y-scroll'>
+                {state.start && <div id="box" className='w-full md:w-[60%] p-8 transition md:overflow-y-scroll'>
                     <div className="flex space-x-2">
                         <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
                         <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
@@ -563,7 +557,7 @@ const Assistant = () => {
                                         if (count.reply < 0) {
                                             if (i === 1) {
                                                 await setState(prev => ({ ...prev, disabled: false }))
-                                                await ref.current.focus()
+                                                await ref.current?.focus()
                                             }
                                             handleStart(i)
                                         }
@@ -572,7 +566,7 @@ const Assistant = () => {
                                         // chọn chat nhưng chưa type thì vẫn chọn script đc
                                         if (message.length === 0 && index.start === 1 && i === 0) {
                                             setIndex(prev => ({ ...prev, start: i }))
-                                            setCount(prev => ({ ...prev, reply: 0 }))//setCountReply(0)
+                                            setCount(prev => ({ ...prev, reply: 0 }))
                                             setState(prev => ({ ...prev, disabled: true }))
                                         }
                                     }}
@@ -656,7 +650,7 @@ const Assistant = () => {
             </div>
 
             {/* button feedback and reset */}
-            <div className='boxchat-footer md:w-[70%] md:ml-auto mt-[10px]'>
+            <div className='boxchat-footer md:w-[70%] md:ml-auto py-[10px]'>
                 <div className="flex justify-end items-center space-x-5 mr-[15px]">
                     <div className="bg-[#FFD4E4] w-[150px] h-[50px] flex justify-center items-center text-center text-[primary] rounded-[12px] p-6 hover:cursor-pointer">Send to us feedback to improve App better</div>
                     <div
@@ -664,7 +658,7 @@ const Assistant = () => {
                         className="bg-[blue] w-[150px] h-[50px] flex justify-center items-center text-center text-[white] rounded-[12px] p-6 hover:cursor-pointer">Reset the conversation </div>
                 </div>
                 {/* Input Chat */}
-                <div className='w-full flex justify-center rounded-sm py-[10px] '>
+                {index.start === 1 && <div className='w-full flex justify-center rounded-sm pt-[10px] '>
                     <input
                         disabled={state.disabled}
                         ref={ref}
@@ -679,12 +673,12 @@ const Assistant = () => {
                         className='h-[38px] text-2xl p-3 text-[blue] rounded-[20px] hover:bg-[blue] hover:text-white'
                         onClick={(e) => {
                             e.preventDefault()
-                            setCount(prev => ({ ...prev, reply: count.reply + 1 })) //setCountReply(countReply => countReply + 1)
+                            setCount(prev => ({ ...prev, reply: count.reply + 1 }))
                             if (count.reply >= 0) handleChat()
                             setState(prev => ({ ...prev, disabled: false }))
                         }}
                     >SEND</button>
-                </div>
+                </div>}
             </div>
 
         </div >
