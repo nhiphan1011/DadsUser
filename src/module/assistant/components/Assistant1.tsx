@@ -1,5 +1,4 @@
 
-
 import { useEffect, useRef, useState } from "react";
 import Typewriter from 'typewriter-effect';
 import { Button, Modal, Space, notification } from "antd";
@@ -8,12 +7,9 @@ import axios from "axios";
 import { SelectInput, TypingDots, Reply } from "components";
 import Bot from "../../../assets/image/Bot.png";
 import ButtonSendToBot from "../../../assets/image/ButtonSendToBot.png";
-import User from "../../../assets/image/User.png";
 import { API_URL } from "../constants";
-import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonEnd, YesNoButtonStart, TextBotExamYN } from 'constant';
+import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonStart, TextBotExamYN } from 'constant';
 
-
-// gom state, ứng dụng spread 
 const Assistant = () => {
     const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: Array<number>, end: number }>({
         start: -1,
@@ -29,13 +25,15 @@ const Assistant = () => {
         bot: "",
         exam: "",
     })
-    const [value, setValue] = useState<{ selected: string, message: string, email: string, optionBot: Array<string> }>({
+    const [value, setValue] = useState<{ selected: string, message: string, email: string, optionBot: Array<string>, heightOptions: number | undefined }>({
         selected: "Graphic & design",
         message: "", // value từ user, value từ input
         email: "",
-        optionBot: []
+        optionBot: [],
+        heightOptions: 0
     })
-    const [state, setState] = useState<{ index3: boolean, showEnd: boolean, loading: boolean, ask: boolean, again: boolean, request: boolean, btnDisable: boolean, disabled: boolean }>({
+    const [state, setState] = useState<{ start: boolean, index3: boolean, showEnd: boolean, loading: boolean, ask: boolean, again: boolean, request: boolean, btnDisable: boolean, disabled: boolean }>({
+        start: false,
         index3: false,
         showEnd: false,
         loading: false,
@@ -62,10 +60,6 @@ const Assistant = () => {
         boxChatEnd: [],
     })
     const [api, contextHolder] = notification.useNotification();
-    console.log("index", index)
-    console.log("boxChat", boxChat)
-    console.log("text", text)
-    console.log("count", count)
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
         setState(prev => ({ ...prev, btnDisable: true, loading: true, disabled: true }))
@@ -82,8 +76,9 @@ const Assistant = () => {
             const _topic = encodeURIComponent(topic)
             const source = await axios.get(`${API_URL}?topic=${_topic}`)
             if (source) {
-                setValue(prev => ({ ...prev, optionBot: source.data.data }))
+                await setValue(prev => ({ ...prev, optionBot: source.data.data }))
             }
+            if (document.getElementById("boxwrap")?.scrollHeight) setValue(prev => ({ ...prev, heightOptions: document.getElementById("boxwrap")?.scrollHeight }))
             // setValue(prev => ({ ...prev, optionBot: ["option1", "option2", "option3", "option4", "option5", "option6", "option7", "option8", "option9", "option10", "option11", "option12"] }))
 
         }
@@ -92,7 +87,7 @@ const Assistant = () => {
             const source = await axios.get(`${API_URL}?promptQuestion=${_question}`)
             if (source) {
                 setText(prev => ({ ...prev, bot: source.data.data }))
-                // setText(prev => ({ ...prev, bot: "" }))
+                setText(prev => ({ ...prev, bot: "" }))
             }
             // setText(prev => ({ ...prev, bot: "Data question" }))
         }
@@ -194,6 +189,7 @@ const Assistant = () => {
                             setTimeout(() => {
                                 setState(prev => ({ ...prev, ask: true }))
                             }, 2000)
+
                         }
                         else if (state.again) {
                             setBoxChat(prev => ({ ...prev, boxChat5: [...boxChat.boxChat5, { user: "bot", value: messageBot }] }))
@@ -418,6 +414,7 @@ const Assistant = () => {
                 <button
                     disabled={state.btnDisable}
                     onClick={(e) => {
+                        setState(prev => ({ ...prev, btnDisable: true }))
                         if (count.reply === 4 && index.YN === 0) handleOption(e, i)
                         else if (count.reply === 6 && index.YN === 1) handleOption(e, i)
                         else if (count.reply === 2 && index.obj === 1) handleOption(e, i)
@@ -478,8 +475,9 @@ const Assistant = () => {
             placement
         });
     };
+    console.log("value", value.heightOptions)
     const AskAgain = () => {
-        const handleOk = () => {
+        const handleOk = async () => {
             setState(prev => ({ ...prev, ask: false, again: true }))
         }
 
@@ -519,19 +517,17 @@ const Assistant = () => {
     }, [text.user, text.bot]);
     // auto scroll end
     useEffect(() => {
-        const boxchat = document.getElementById('boxchat')
-        const boxwrap = document.getElementById('boxwrap')
-        const sH = boxchat?.scrollHeight
-        // const cH = boxchat?.clientHeight
-        // if (sH && cH && sH > cH) 
-        if (sH && sH > 197) boxwrap?.scrollTo(0, boxchat?.scrollHeight);
-
-    }, [document.getElementById('boxchat')?.scrollHeight])
+        const box = document.getElementById("boxwrap")
+        if (box) box.scrollTop = box.scrollHeight
+    }, [document.getElementById("boxwrap")?.scrollHeight, boxChat])
+    useEffect(() => {
+        const box = document.getElementById("boxwrap")
+        if (state.again && box && value.heightOptions) box.scrollTop = value.heightOptions
+    }, [document.getElementById("boxwrap")?.scrollHeight, state.again])
     return (
-        <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col justify-between overflow-y-scroll">
+        <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col justify-between ">
             {contextHolder}
-            <div id="boxwrap"
-                className='w-full md:h-[calc(100vh-67.5px-62px)] flex flex-col md:flex-row overflow-y-scroll'>
+            <div className='md:h-[calc(100vh-108px-62px)] flex flex-col md:flex-row  '>
                 {/* Avatar Bot */}
                 <div className="w-full md:w-[40%] pt-6 px-8">
                     <p className="font-bold">Alley</p>
@@ -542,10 +538,10 @@ const Assistant = () => {
                             <div className="bg-[#F2F4F5] p-4  text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
                                 <Typewriter
                                     options={{
-                                        delay: 50
+                                        delay: 1
                                     }}
                                     onInit={(typewriter) => {
-                                        typewriter.typeString(TextBotExam).start()
+                                        typewriter.typeString(TextBotExam).callFunction(() => setState(prev => ({ ...prev, start: true }))).start()
                                     }}
                                 />
                             </div>
@@ -554,7 +550,7 @@ const Assistant = () => {
                     </div>
                 </div>
                 {/* Box Chat`` */}
-                <div className='w-full p-8 transition '>
+                {state.start && <div id="boxwrap" className='w-full md:w-[60%] p-8 transition overflow-y-scroll'>
                     <div className="flex space-x-2">
                         <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
                         <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
@@ -658,7 +654,7 @@ const Assistant = () => {
                         {state.loading && <Loading />}
                         {state.ask && <AskAgain />}
                     </div>
-                </div>
+                </div>}
             </div>
 
             {/* button feedback and reset */}

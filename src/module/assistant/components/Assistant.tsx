@@ -6,7 +6,7 @@ import Bot from "../../../assets/image/Bot.png";
 import ButtonSendToBot from "../../../assets/image/ButtonSendToBot.png";
 import User from "../../../assets/image/User.png";
 import { API_URL } from "../constants";
-import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonEnd, YesNoButtonStart, TextBotExamYN } from 'constant';
+import { SKILLS, ArrObjectives, TextBotExam, TextBotExample, Topic, YesNoButton, YesNoButtonStart, TextBotExamYN } from 'constant';
 
 
 // gom state, ứng dụng spread 

@@ -21,10 +21,6 @@ export const YesNoButtonStart = [
     "Chat now"
 ];
 export const YesNoButton = ["Yes, I want to ask in detail", "No, I want to ask again"];
-export const YesNoButtonEnd = [
-    "Yes, I want to know how to avoid scammers online",
-    "No, I don’t want to talk about this topic",
-];
 export const Topic = [
     "Affiliate Marketing",
     "Freelancing",
