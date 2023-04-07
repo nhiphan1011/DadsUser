@@ -59,6 +59,7 @@ const Assistant = () => {
         boxChat7: [],
         boxChatEnd: [],
     })
+    console.log(state)
     const [api, contextHolder] = notification.useNotification();
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
@@ -408,7 +409,7 @@ const Assistant = () => {
             );
         })}
     </div>
-    const OptionComponent = <div className={`space-x-5 flex flex-wrap justify-center `}>
+    const OptionComponent = <div id="op" tabIndex={0} className={`space-x-5 flex flex-wrap justify-center `}>
         {value.optionBot.map((item: any, i: any) => {
             return (
                 <button
@@ -479,6 +480,7 @@ const Assistant = () => {
     const AskAgain = () => {
         const handleOk = async () => {
             setState(prev => ({ ...prev, ask: false, again: true }))
+            document.getElementById("op")?.focus()
         }
 
         const handleCancel = () => {
@@ -520,10 +522,6 @@ const Assistant = () => {
         const box = document.getElementById("boxwrap")
         if (box) box.scrollTop = box.scrollHeight
     }, [document.getElementById("boxwrap")?.scrollHeight, boxChat])
-    useEffect(() => {
-        const box = document.getElementById("boxwrap")
-        if (state.again && box && value.heightOptions) box.scrollTop = value.heightOptions
-    }, [document.getElementById("boxwrap")?.scrollHeight, state.again])
     return (
         <div className="w-full h-[calc(100vh-67.5px-62px)] md:h-[calc(100vh-62px)] flex flex-col justify-between ">
             {contextHolder}
