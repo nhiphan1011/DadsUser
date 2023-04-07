@@ -280,7 +280,7 @@ const Assistant = () => {
         // setCountTextBotExample(countTextBotExample => countTextBotExample + 1)
     };
     const handleStart = (i: number) => {
-        ref.current?.focus()
+        // ref.current?.focus()
         setIndex(prev => ({ ...prev, start: i }))
         setCount(prev => ({ ...prev, reply: count.reply + 1 }))
     }
@@ -427,7 +427,7 @@ const Assistant = () => {
                         else if (state.again) handleOption(e, i)
                     }}
                     key={i}
-                    className={`fadeIn w-fit max-w-[20%] min-w-[20%] option flex justify-center items-center text-center rounded-[12px] my-2 p-6 first-letter:p-6 hover:cursor-pointer break-words
+                    className={`fadeIn w-fit max-w-[20%] min-w-[45%] md:min-w-[20%] option flex justify-center items-center text-center rounded-[12px] my-2 p-6 first-letter:p-6 hover:cursor-pointer break-words
         bg-[${index.options.includes(i) ? "#EBE1FF" : "#F2F4F5"}] 
         text-[${index.options.includes(i) ? "#120360" : "primary"}] 
         hover:bg-[${!index.options.includes(i) && state.btnDisable === false && state.request === false ? "#EBE1FF" : "#F2F4F5"}]
@@ -557,7 +557,7 @@ const Assistant = () => {
                                         if (count.reply < 0) {
                                             if (i === 1) {
                                                 await setState(prev => ({ ...prev, disabled: false }))
-                                                await ref.current?.focus()
+                                                // await ref.current?.focus()
                                             }
                                             handleStart(i)
                                         }
@@ -660,6 +660,7 @@ const Assistant = () => {
                 {/* Input Chat */}
                 {index.start === 1 && <div className='w-full flex justify-center rounded-sm pt-[10px] '>
                     <input
+                        autoFocus
                         disabled={state.disabled}
                         ref={ref}
                         onKeyDown={e => handleChatEnter(e)}
