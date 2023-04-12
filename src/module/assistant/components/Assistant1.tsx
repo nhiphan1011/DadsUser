@@ -14,13 +14,15 @@ const Assistant = () => {
     const box = document.getElementById("box")
     const mbox = document.getElementById("box-m")
     const footerHeight = document.getElementsByClassName("boxchat-footer")[0]?.clientHeight
-    const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: Array<number>, end: number }>({
+    const [index, setIndex] = useState<{ start: number, obj: number, YN: number, YN1: number, topic: number, options: Array<number>, ask: number, ask1: number, end: number }>({
         start: -1,
         obj: -1,
         YN: -1,
         YN1: -1,
         topic: -1,
         options: [],
+        ask: -1,
+        ask1: -1,
         end: -1,
     })
     const [text, setText] = useState<{ user: string, bot: string, exam: string }>({
@@ -35,24 +37,26 @@ const Assistant = () => {
         optionBot: [],
         heightOptions: 0
     })
-    const [state, setState] = useState<{ start: boolean, index3: boolean, showEnd: boolean, loading: boolean, ask: boolean, again: boolean, request: boolean, btnDisable: boolean, disabled: boolean }>({
+    const [state, setState] = useState<{ start: boolean, showEnd: boolean, loading: boolean, ask: boolean, again: boolean, request: boolean, selectDisable: boolean, btnDisable: boolean, disabled: boolean }>({
         start: false,
-        index3: false,
-        showEnd: false,
+        // start: true,
         loading: false,
-        ask: false, //modal xuất hiện
+        ask: false,
         again: false, //vẫn còn hỏi tiếp
         request: false,
+        showEnd: false,
+        selectDisable: false,
         btnDisable: false,
         disabled: true//input disable
     })
-    const [count, setCount] = useState<{ reply: number, YN: number, textBotExample: number }>({
+    const [count, setCount] = useState<{ reply: number, YN: number, textBotExample: number, ask: number }>({
         reply: -1,// sau 1 click count+=1
         YN: -1,// dùng để đếm caseYN
-        textBotExample: 0
+        textBotExample: 0,
+        ask: -1
     })
     const [message, setMessage] = useState<string>("")
-    const [boxChat, setBoxChat] = useState<{ boxChat1: Array<any>, boxChat2: Array<any>, boxChat3: Array<any>, boxChat4: Array<any>, boxChat5: Array<any>, boxChat6: Array<any>, boxChat7: Array<any>, boxChatEnd: Array<any>, }>({
+    const [boxChat, setBoxChat] = useState<{ boxChat1: Array<any>, boxChat2: Array<any>, boxChat3: Array<any>, boxChat4: Array<any>, boxChat5: Array<any>, boxChat6: Array<any>, boxChat7: Array<any>, ask1: Array<any>, boxChatEnd: Array<any>, }>({
         boxChat1: [],
         boxChat2: [],
         boxChat3: [],
@@ -60,6 +64,7 @@ const Assistant = () => {
         boxChat5: [],
         boxChat6: [],
         boxChat7: [],
+        ask1: [],
         boxChatEnd: [],
     })
     const [api, contextHolder] = notification.useNotification();
@@ -79,7 +84,7 @@ const Assistant = () => {
     }, [mbox?.scrollHeight, boxChat])
     const post = async (act: string, skill: string, topic: string, question: string, message: string) => {
         setText(prev => ({ ...prev, user: "" }))
-        setState(prev => ({ ...prev, btnDisable: true, loading: true, disabled: true }))
+        setState(prev => ({ ...prev, loading: true, disabled: true }))
         if (act && skill) {
             const _act = encodeURIComponent(act)
             const _skill = encodeURIComponent(skill)
@@ -116,7 +121,7 @@ const Assistant = () => {
             setState(prev => ({ ...prev, disabled: false }))
             ref.current.focus()
         }
-        setState(prev => ({ ...prev, btnDisable: false, loading: false }))
+        setState(prev => ({ ...prev, loading: false }))
     };
     const handleChangeSelect = (e: any) => setValue(prev => ({ ...prev, selected: e.target.value }));
     const handleAddText = async (messageUser: string, messageBot: string, countReply: number) => {
@@ -343,28 +348,35 @@ const Assistant = () => {
         }
     }
     const Loading = () => (
-        <div className="flex space-x-2 my-[10px]">
-            <img src="/static/media/Bot.e33d536bdd412e738363.png" alt="" className="w-[50px]    -[50px] object-contain" />
-            <div className="bg-[#F2F4F5] max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
+        <div className="flex">
+            <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
+            <div className="bg-[#F2F4F5] max-w-[400px] h-[100%] p-4 mb-5 text-primary rounded-r-[16px] rounded-tl-[16px]">
                 <TypingDots />
             </div>
         </div>)
     const SelectAndSendComponent = (
-        <div className="flex max-w-[500px] space-x-8 mx-auto mt-10 justify-center items-center">
-            <div className="max-w-[300px]">
+        <div className="flex max-w-[500px] mb-5 mx-auto justify-center items-center">
+            <div className="max-w-[300px] mx-2.5">
                 <SelectInput
+                    disabled={state.selectDisable}
                     arr={SKILLS}
                     name="skills"
-                    handleChange={handleChangeSelect}
+                    handleChange={(e) => {
+                        setState(prev => ({ ...prev, selectDisable: true }))
+                        if (index.obj === 0) {
+                            if (count.reply === 1) handleChangeSelect(e)
+                        }
+                    }
+                    }
                 />
             </div>
             <div
-                className="flex space-x-6  items-center bg-blue-500 hover:bg-blue-600 transition hover:text-white hover:cursor-pointer hover:scale-105  py-2 px-6 rounded-[16px]"
+                className="flex space-x-6 items-center bg-blue-500 hover:bg-blue-600 transition hover:text-white hover:cursor-pointer hover:scale-105 mx-2.5 py-2 px-6 rounded-[16px]"
                 onClick={(e) => {
                     if (count.reply === 1) handleSend()// chỉ cần .r= 1 trong case obj = 0 vì các case khác ko có SendButton
                     else if (count.reply === 3 && index.YN === 1 && count.YN === 0) {
                         handleSend()
-                        setCount(prev => ({ ...prev, setCountTextBotExample: 1 }))
+                        setCount(prev => ({ ...prev, textBotExample: 1 }))
                     }
                 }}
             >
@@ -372,16 +384,16 @@ const Assistant = () => {
             </div>
         </div>)
     const YesNoButtonComponent = ({ index }: { index: number }) => (
-        <div className="flex justify-center items-center space-x-5">
+        <div className="flex justify-center items-center mb-5">
             {YesNoButton.map((item, i) => {
                 return (
                     <div
                         onClick={(e) => {
                             if (count.reply === 2) handleYesNoButton(e, i) // chọn Yes/No lần 1
-                            if (count.reply === 4) handleYesNoButton(e, i) // chọn Yes/No lần 1
+                            if (count.reply === 4 && count.YN === 1) handleYesNoButton(e, i) // chọn Yes/No lần 1
                         }}
                         key={i}
-                        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer
+                        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] mx-2.5  p-6 hover:cursor-pointer
                         bg-[${index === i ? "#EBE1FF" : "#F2F4F5"}] 
                         text-[${index === i ? "#120360" : "primary"}] 
                         hover:bg-[${index < 0 ? "#EBE1FF" : "#F2F4F5"}]
@@ -394,7 +406,7 @@ const Assistant = () => {
             })}
         </div>
     )
-    const TopicComponent = <div className=" space-x-5 flex flex-wrap justify-center">
+    const TopicComponent = <div className="flex flex-wrap justify-center">
         {Topic.map((item, i) => {
             return (
                 <div
@@ -404,7 +416,7 @@ const Assistant = () => {
                         else if (count.reply === 5 && index.YN === 1) handleTopic(e, i)
                     }}
                     key={i}
-                    className={`w-fit max-w-[23%] md:max-w-[30%] md:min-w-[18%] fadeIn flex justify-center items-center text-center rounded-[12px] my-2 p-6 hover:cursor-pointer break-words
+                    className={`w-fit max-w-[23%] md:max-w-[30%] md:min-w-[18%] fadeIn flex justify-center items-center text-center rounded-[12px] mx-2.5 mb-5 p-6 hover:cursor-pointer break-words
                         bg-[${index.topic === i ? "#EBE1FF" : "#F2F4F5"}] 
                         text-[${index.topic === i ? "#120360" : "primary"}] 
                         hover:bg-[${index.topic < 0 ? "#EBE1FF" : "#F2F4F5"}]
@@ -414,7 +426,7 @@ const Assistant = () => {
             );
         })}
     </div>
-    const OptionComponent = <div id="options" tabIndex={0} className={`space-x-5 flex flex-wrap justify-center `}>
+    const OptionComponent = <div id="options" tabIndex={0} className={`flex flex-wrap justify-center mb-2.5`}>
         {value.optionBot.map((item: any, i: any) => {
             return (
                 <button
@@ -427,7 +439,7 @@ const Assistant = () => {
                         else if (state.again) handleOption(e, i)
                     }}
                     key={i}
-                    className={`fadeIn w-fit max-w-[20%] min-w-[45%] md:min-w-[20%] option flex justify-center items-center text-center rounded-[12px] my-2 p-6 first-letter:p-6 hover:cursor-pointer break-words
+                    className={`fadeIn w-fit max-w-[20%] min-w-[45%] md:min-w-[20%] option flex justify-center items-center text-center rounded-[12px] m-2.5 p-6 first-letter:p-6 hover:cursor-pointer break-words
         bg-[${index.options.includes(i) ? "#EBE1FF" : "#F2F4F5"}] 
         text-[${index.options.includes(i) ? "#120360" : "primary"}] 
         hover:bg-[${!index.options.includes(i) && state.btnDisable === false && state.request === false ? "#EBE1FF" : "#F2F4F5"}]
@@ -443,7 +455,7 @@ const Assistant = () => {
             setIndex(prev => ({ ...prev, end: 0 }))
             setState(prev => ({ ...prev, showEnd: true }))
         }}
-        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 m-auto my-5 hover:cursor-pointer
+        className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 m-auto mb-5 hover:cursor-pointer
             bg-[${index.end === 0 ? "#EBE1FF" : "#F2F4F5"}] 
             text-[${index.end === 0 ? "#120360" : "primary"}] 
             hover:bg-[${index.end < 0 ? "#EBE1FF" : "#F2F4F5"}]
@@ -479,12 +491,13 @@ const Assistant = () => {
             message: `Notification`,
             description:
                 "Your email is invalid",
-            placement
+            placement,
+            onClose: () => document.getElementById("inputEmail")?.focus()
         });
     };
     const AskAgain = () => {
         const handleOk = async () => {
-            setState(prev => ({ ...prev, ask: false, again: true }))
+            setState(prev => ({ ...prev, ask: false, again: true, btnDisable: false }))
             document.getElementById("options")?.focus()
         }
 
@@ -530,7 +543,7 @@ const Assistant = () => {
                             <div className="bg-[#F2F4F5] p-4  text-primary text-base rounded-r-[14px] rounded-bl-[16px]">
                                 <Typewriter
                                     options={{
-                                        delay: 30
+                                        delay: 20
                                     }}
                                     onInit={(typewriter) => {
                                         typewriter.typeString(TextBotExam).callFunction(() => setState(prev => ({ ...prev, start: true }))).start()
@@ -545,11 +558,11 @@ const Assistant = () => {
                 {state.start && <div id="box" className='w-full md:w-[60%] p-8 transition md:overflow-y-scroll'>
                     <div className="flex space-x-2">
                         <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
-                        <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
+                        <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-4 text-primary rounded-r-[16px] rounded-tl-[16px]">
                             {`Please choose the kind of talking with me`}
                         </div>
                     </div>
-                    <div className="flex justify-center items-center space-x-5 mb-5">
+                    <div className="flex justify-center items-center mb-5">
                         {YesNoButtonStart.map((item, i) => {
                             return (
                                 <button
@@ -571,7 +584,7 @@ const Assistant = () => {
                                         }
                                     }}
                                     key={i}
-                                    className={`w-[30%] flex justify-center items-center text-center rounded-[12px] p-6 hover:cursor-pointer 
+                                    className={`w-[30%] flex justify-center items-center text-center rounded-[12px] mx-2.5 p-6 hover:cursor-pointer 
                                     bg-[${index.start === i ? "#EBE1FF" : "#F2F4F5"}] text-[${index.start === i ? "#120360" : "primary"}] hover:bg-[${(count.reply < 1 && index.start !== 0) ? "#EBE1FF" : "#F2F4F5"}] hover:text-[${(count.reply < 1 && index.start !== 0) ? "#120360" : "primary"}]`}
                                 >
                                     {item}
@@ -585,12 +598,12 @@ const Assistant = () => {
                             <>
                                 <div className="flex space-x-2">
                                     <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
-                                    <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-[10px] text-primary rounded-r-[16px] rounded-bl-[16px]">
+                                    <div className="bg-[#F2F4F5]  max-w-[400px] h-[100%] p-4 mb-5 text-primary rounded-r-[16px] rounded-tl-[16px]">
                                         {`I know you have some concerns that need me support, let's tell me now.`}
                                     </div>
                                 </div>
-                                <p className="text-primary font-bold">Choose objectives</p>
-                                <div className="flex justify-between mt-5 space-x-4">
+                                <p className="text-primary font-bold mb-5">Choose objectives</p>
+                                <div className="flex justify-between mb-5">
                                     {ArrObjectives.map((item, i) => {
                                         return (
                                             <div
@@ -609,7 +622,7 @@ const Assistant = () => {
                         )}
                         {boxChat.boxChat1.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {boxChat.boxChat1.length >= 2 && index.obj === 0 && SelectAndSendComponent}
-                        {state.index3 && (
+                        {boxChat.boxChat1.length >= 2 && index.obj === 2 && (
                             <>
                                 <div className="flex space-x-2">
                                     <img src={Bot} alt="" className="w-[50px] h-[50px] object-contain" />
@@ -618,8 +631,7 @@ const Assistant = () => {
                                     </div>
                                 </div>
                                 {ShowEndComponent}
-                            </>
-                        )}
+                            </>)}
                         {boxChat.boxChat1.length >= 2 && index.obj === 1 && TopicComponent}
                         {boxChat.boxChat2.map((reply, index) => <Reply key={index} id={index} data={reply} />)}
                         {index.obj === 0 && boxChat.boxChat2.length >= 2 && <YesNoButtonComponent index={index.YN} />}

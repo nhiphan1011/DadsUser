@@ -7,10 +7,12 @@ interface ISelectInput {
   arr: Array<any>;
   dadsCoins?: boolean;
   handleChange: (e: any) => void;
+  disabled?: boolean
 }
-const SelectInput = ({ className = "", name, arr, dadsCoins, multiple, handleChange }: ISelectInput) => {
+const SelectInput = ({ className = "", name, arr, dadsCoins, multiple, handleChange, disabled }: ISelectInput) => {
   return (
     <select
+      disabled={disabled}
       className={`${className} w-full min-w-[150px] px-[15px] min-h-[38px] bg-[#EBE1FF] text-[#120360] text-xl font-light rounded-[12px] shadow-lg border-none relative`}
       name={name}
       multiple={multiple}
