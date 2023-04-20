@@ -1,11 +1,11 @@
 import { useAppDispatch } from "hooks/reduxHooks";
-
+import Logo from 'assets/image/Logo_dads.png'
 const Header = () => {
   return (
     <nav className="px-2 bg-primary border-gray-200 py-4">
       <div className="container flex md:flex-wrap flex-nowrap items-center justify-between mx-auto">
         <a href="#" className="flex items-center">
-          <img src="/Logo_dads_white.svg" className="h-6 mr-3 sm:h-10" alt="Flowbite Logo" />
+          <img src={Logo} className="h-6 mr-3 sm:h-10" alt="Flowbite Logo" />
         </a>
         <button
           data-collapse-toggle="navbar-dropdown"

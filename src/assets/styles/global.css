@@ -197,3 +197,5 @@ div {
 .fadeIn:nth-child(13) {
   animation-delay: 1.2s;
 }
+
+.modal {}

@@ -14,10 +14,7 @@ export const TextBotExamYN = [
     "Kindly choose again",
     "I'm sorry, I'm not quite sure what you are looking for. Can you please provide me with a more specific topic below that you would like advice on."
 ]
-export const TextBotAskAgain = [
-    "Do you want to ask more ?",
-    "Let's choose another question"
-]
+export const TextBotAskAgain = "Do you want to ask more ?"
 export const TextBotExam =
     "Hello there! I am AiLey, your friendly AI assistant. I am here to assist you with anything you need and to make your day a little brighter. <br> In my free time, I love chatting with new people and learning about different cultures. <br> I also enjoy playing games, reading books, and taking long virtual walks in the park. I'm always here to listen and have a conversation, so feel free to ask me anything! ";
 export const YesNoButtonStart = [

@@ -373,6 +373,7 @@ const Assistant = () => {
             <div
                 className="flex space-x-6 items-center bg-blue-500 hover:bg-blue-600 transition hover:text-white hover:cursor-pointer hover:scale-105 mx-2.5 py-2 px-6 rounded-[16px]"
                 onClick={(e) => {
+                    setState(prev => ({ ...prev, selectDisable: true }))
                     if (count.reply === 1) handleSend()// chỉ cần .r= 1 trong case obj = 0 vì các case khác ko có SendButton
                     else if (count.reply === 3 && index.YN === 1 && count.YN === 0) {
                         handleSend()
@@ -508,24 +509,29 @@ const Assistant = () => {
 
         return (
 
-            <Modal
-                closable={false}
-                centered={true}
-                open={state.ask}
-                title="Notification"
-                onOk={handleOk}
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="back" onClick={handleCancel}>
-                        Go to end
-                    </Button>,
-                    <Button className="bg-[#1677ff]" key="submit" type="primary" onClick={handleOk}>
-                        OK
-                    </Button>,
-                ]}
+            <button
+                data-keyboard="false"
+                data-backdrop="static"
             >
-                <p>Do you want to ask again ?</p>
-            </Modal>
+                <Modal
+                    closable={false}
+                    open={state.ask}
+
+                    title="Notification"
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Go to end
+                        </Button>,
+                        <Button className="bg-[#1677ff]" key="submit" type="primary" onClick={handleOk}>
+                            OK
+                        </Button>,
+                    ]}
+                >
+                    <p>Do you want to ask again ?</p>
+                </Modal>
+            </button>
 
         )
     }

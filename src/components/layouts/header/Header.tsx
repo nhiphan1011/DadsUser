@@ -6,7 +6,7 @@ import { useAppDispatch } from "hooks";
 import SearchField from "components/formcontrols/SearchField";
 import Dropdown from "./Dropdown";
 import LoginButton from "./LoginButton";
-
+import Logo from 'assets/image/Logo_dads.png'
 // import { loginUser } from "module/auth";
 
 import { BellIcon } from "@heroicons/react/24/solid";
@@ -22,7 +22,7 @@ const Header = () => {
       <div className="md:container flex md:flex-wrap flex-nowrap items-center justify-between mx-auto md:px-0 px-4">
         <div className="flex space-x-10 items-center justify-center">
           <Link to="/" className="flex items-center">
-            <img src="/Logo_dads_white.svg" className="h-6 mr-3 sm:h-10" alt="Flowbite Logo" />
+            <img src={Logo} className="h-6 mr-3 sm:h-10" alt="Flowbite Logo" />
           </Link>
           <Link to="/" className="flex items-center text-white">
             Become an Advertiser

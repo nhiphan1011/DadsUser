@@ -1,5 +1,5 @@
 import React from "react";
-
+import Logo from 'assets/image/Logo_dads.png'
 import { BeakerIcon } from "@heroicons/react/24/solid";
 import { useLocation } from "react-router-dom";
 const Footer = () => {
@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="md:flex px-8 ">
         <div className="mb-6 md:mb-0 md:w-1/5">
           <a href="/" className="flex items-center">
-            <img src="/Logo_dads_white.svg" className="mr-3 h-20" alt="Dads Logo" />
+            <img src={Logo} className="mr-3 h-20" alt="Dads Logo" />
           </a>
         </div>
         <div className="flex md:justify-around md:w-2/5 justify-between md:mb-0 mb-6">
